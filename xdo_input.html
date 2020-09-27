@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+		<body>
+			<form id=form method=get >
+				<p>Last command: %(cmd)s %(key)s </p>
+				
+				<input type=text name="cmd" value="%(cmd)s" />
+				<input type=text name="key" value="%(key)s" />
+				<button type=submit >submit</button>
+				<br/>
+				<div style="display=flex">
+				<button type=button onClick="btnClickKey('--clearmodifiers XF86AudioRaiseVolume')" > Vol+</button>
+				<button type=button onClick="btnClickKey('--clearmodifiers XF86AudioLowerVolume')" > Vol-</button>
+				
+				<button type=button onClick="btnClickKey('alt+Tab')" > alt+Tab</button>
+				<button type=button onClick="btnClickKey('alt+F4')" > alt+F4</button>
+				<button type=button onClick="btnClickMouse(' 0 0 click 1')" > Left Click</button>
+				<button type=button onClick="btnClickMouse(' 0 0 click 3')" > Right Click</button>
+				<button type=button onClick="btnClickSetCmd('mousemove_relative --sync ')" > Mouse Move</button>
+				<button type=button onClick="btnClickSetCmd('key')" > key cmd</button>
+				
+				<button type=button onClick="btnClickKey('--clearmodifiers XF86AudioMute')" > Mute</button>
+				<button type=button onClick="btnClickKey('--clearmodifiers XF86AudioPlay')" > Play</button>
+				<button type=button onClick="btnClickKey('--clearmodifiers XF86AudioStop')" > Stop</button>
+				<button type=button onClick="btnClickKey('--clearmodifiers XF86AudioPrev')" > Prev</button>
+				<button type=button onClick="btnClickKey('--clearmodifiers XF86AudioNext')" > Next</button>
+
+
+				</div>
+				<br/>
+				<br/>
+				<br/>
+				<track-pad ></track-pad>
+				
+				<script>
+				var form = document.getElementById("form");
+				function btnClickKey(value){
+					form.cmd.value= "key";
+					form.key.value=value;
+					form.submit();
+				}
+				function btnClickMouse(value){
+					form.cmd.value= "mousemove_relative --sync ";
+					form.key.value=value;
+					form.submit();
+				}
+				function btnClickSetCmd(cmd){
+					form.cmd.value= cmd;
+					form.key.value="";
+				}
+				</script>
+				<style>
+					button{
+					min-height:70px;
+					min-width:100px;
+					margin:10px
+					
+					}
+				</style>
+				
+				<script>
+					function createFromData(cmd, key){
+						var formData = new FormData(form);
+						form.cmd.value= cmd;
+						form.key.value=key;
+						//formData.append("cmd", cmd);
+						//formData.append("key", key);
+						return formData;
+					}
+					function sendFormData(formData){
+						const data = [...formData.entries()];
+						const asString = data
+						  .map(x => `${encodeURIComponent(x[0])}=${encodeURIComponent(x[1])}`)
+						  .join('&');
+						console.log(asString);
+						fetch('/?'+asString, {
+						  method: 'GET',
+						})
+					}
+						
+						var trackPadElement = document.getElementsByTagName("track-pad")[0]
+					  trackPadElement.deltaCallBack = (delta)=> {
+						  console.log('delta',delta);
+						  var xValue = (delta.x < 0) ? "-- "+delta.x : delta.x;
+						  sendFormData(createFromData("mousemove_relative --sync ", `${xValue} ${delta.y}`))
+					  }
+					  trackPadElement.leftClickCallBack = (touchPoint)=> {
+						  
+						  console.log('left click - touchPoint',touchPoint);
+						  sendFormData(createFromData("mousemove_relative --sync ", ` 0 0 click 1`))
+					  }
+					  
+					  trackPadElement.rightClickCallBack = (touchPoint)=> {
+						  console.log('right click - touchPoint',touchPoint);
+						  sendFormData(createFromData("mousemove_relative --sync ", ` 0 0 click 3`))
+					  }
+					  class Trackpad extends HTMLElement {
+						  constructor() {
+							super();
+							// element created
+							//this.deltaCallBack = this.getAttribute("getDelta")
+						  }
+
+						  connectedCallback() {
+							// browser calls this method when the element is added to the document
+							// (can be called many times if an element is repeatedly added/removed)
+							this.render();
+						  }
+
+						  disconnectedCallback() {
+							// browser calls this method when the element is removed from the document
+							// (can be called many times if an element is repeatedly added/removed)
+						  }
+
+						  static get observedAttributes() {
+							return [/* array of attribute names to monitor for changes */];
+						  }
+
+						  attributeChangedCallback(name, oldValue, newValue) {
+							// called when one of attributes listed above is modified
+						  }
+
+						  adoptedCallback() {
+							// called when the element is moved to a new document
+							// (happens in document.adoptNode, very rarely used)
+						  }
+
+						  // there can be other element methods and properties
+						  render(){
+								const div = document.createElement("div"); 
+								div.style.width = "100%"
+								div.style.height = "500px"
+								div.style.backgroundColor = "beige"
+								div.ontouchmove = this.handleTouchMove;
+								div.ontouchstart = this.handleTouchStart;
+								div.ontouchend = this.handleTouchEnd;
+								this.appendChild(div);
+
+							  
+							  //this.innerHTML = `<h1>Hello, World!</h1>`;
+						  }
+						  start = {x:0, y:0};
+						  move = {x:0, y:0};
+						  handleTouchStart = (event) => {
+							  event.preventDefault();
+							  this.start.x = event.touches[0].pageX;
+							  this.start.y = event.touches[0].pageY;
+							  this.move = {x:0, y:0};
+							}
+
+							handleTouchEnd = (event) => {
+								event.preventDefault();
+								this.move = {x:0, y:0};
+								window.touch = "end"
+								
+								if(event.touches.length > 0){
+									this.rightClickCallBack(this.start)
+								}
+								else if(this.start.x == event.changedTouches[0].pageX && this.start.y == event.changedTouches[0].pageY){
+									
+									this.leftClickCallBack(this.move)
+									
+									
+									
+								}
+							  
+							}
+						  
+						  handleTouchMove = (event) => {
+							  event.preventDefault();
+							  window.touch = "move"
+							  var firstTouch = event.changedTouches[0];
+							  var endX = firstTouch.pageX;
+							  var endY = firstTouch.pageY;
+							  var lastMove = this.move
+							  var max = Math.max(Math.abs(endX-lastMove.x), Math.abs(endY-lastMove.y))
+							  
+							  if(max > 1 &&  (lastMove.x !=0 || lastMove.y !==0) ){
+								  this.deltaCallBack({x: endX-lastMove.x, y:endY-lastMove.y })
+								  console.log("tackpad delta", endX-this.start.x, endY-this.start.y , endX, endY)
+								   
+								  
+							  }
+							  this.move = {x:endX, y:endY};
+							 
+							  
+							  
+						  }
+							  
+						}
+						
+					customElements.define("track-pad", Trackpad);
+
+				  </script>
+				
+			</form>
+		</body>
+	</html>
