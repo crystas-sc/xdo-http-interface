@@ -8,6 +8,7 @@ import urllib
 import subprocess
 import os
 import datetime
+import ssl
 
 
 class S(BaseHTTPRequestHandler):
@@ -26,12 +27,15 @@ class S(BaseHTTPRequestHandler):
 		cmd =""
 		if "?" in self.path:
 			queryParams = self.transformQueryParam()
-			key = queryParams["key"]
-			cmd =  queryParams["cmd"]
+			key = queryParams["key"] if "key" in queryParams.keys() else key 
+			cmd = queryParams["cmd"] if "cmd" in queryParams.keys() else cmd 
 			reqTimestamp =  int(queryParams["timestamp"])
 			currTimestamp =  datetime.datetime.now().replace(tzinfo = datetime.timezone.utc).timestamp()
 			print("timestamp diff ")
 			print((int(currTimestamp) - int(reqTimestamp/1000)))
+			with open('run_commands.csv', 'a',  encoding='utf8') as writer:
+				writeLine = f"{cmd} {key},{reqTimestamp}\n"
+				writer.write(writeLine)
 			if int(currTimestamp) - int(reqTimestamp/1000) < 3 :
 				print("xdotool "+cmd +" "+ key)
 				subprocess.call("xdotool "+cmd +" "+ key, shell=True)
@@ -72,9 +76,15 @@ class S(BaseHTTPRequestHandler):
 			    
 				   
 def run(server_class=HTTPServer, handler_class=S, addr="0.0.0.0", port=80):
-	server_address = (addr, port)
-	httpd = server_class(server_address, handler_class)
+	# server_address = (addr, port)
+	# httpd = server_class(server_address, handler_class)
 
+	# print(f"Starting httpd server on {addr}:{port}")
+	# httpd.serve_forever()
+
+	server_address = ('0.0.0.0', 443)
+	httpd = HTTPServer(server_address, handler_class)
+	httpd.socket = ssl.wrap_socket(httpd.socket, server_side=True, certfile='./certificate.crt', keyfile="./privatekey.key", ssl_version=ssl.PROTOCOL_TLS)
 	print(f"Starting httpd server on {addr}:{port}")
 	httpd.serve_forever()
 
