@@ -75,14 +75,14 @@ class S(BaseHTTPRequestHandler):
 			   
 			    
 				   
-def run(server_class=HTTPServer, handler_class=S, addr="0.0.0.0", port=80):
+def run(server_class=HTTPServer, handler_class=S, addr="0.0.0.0", port=443):
 	# server_address = (addr, port)
 	# httpd = server_class(server_address, handler_class)
 
 	# print(f"Starting httpd server on {addr}:{port}")
 	# httpd.serve_forever()
 
-	server_address = ('0.0.0.0', 443)
+	server_address = (addr, port)
 	httpd = HTTPServer(server_address, handler_class)
 	httpd.socket = ssl.wrap_socket(httpd.socket, server_side=True, certfile='./certificate.crt', keyfile="./privatekey.key", ssl_version=ssl.PROTOCOL_TLS)
 	print(f"Starting httpd server on {addr}:{port}")
