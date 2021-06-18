@@ -52,8 +52,15 @@
     </div>
     <br />
     <br />
+    
     <br />
     <track-pad></track-pad>
+  </form>
+  <a href="/fileserve" target="_blank">Static files</a>
+  <form target="_blank" enctype = "multipart/form-data" action = "/fileupload" method = "post">
+    <p>Upload File: <input type = "file" name = "file" /></p>
+    <p><input type = "submit" value = "Upload" /></p>
+  </form>
 
     <script>
       var form = document.getElementById("form");
@@ -239,7 +246,7 @@
       }
 
     </script>
-  </form>
+  
 </body>
 
 </html>
