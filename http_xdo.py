@@ -13,11 +13,21 @@ import os
 from pathlib import Path
 import cgi
 import shutil
+from asyncio_websocket import main as wsmain
+import asyncio
+
+import multiprocessing as mp
+
+
 
 
 class S(BaseHTTPRequestHandler):
 	base_static_file_path = os.path.dirname(os.path.abspath(__file__))+'/static_files'
-	upload_file_path = os.path.dirname(os.path.abspath(__file__))+'/static_files/uploads'
+	base_static_file_path = "/initrd/mnt/dev_save/songs/sn"
+	#base_static_file_path =  "/dev/null"   #"/home/spot/Downloads/sn"
+	base_static_file_path = "/home/spot/Downloads/sn"
+	#upload_file_path = os.path.dirname(os.path.abspath(__file__))+'/static_files/uploads'
+	upload_file_path = "/dev/null"
 	
 	def _set_headers(self):
 		self.send_response(200)
@@ -82,8 +92,8 @@ class S(BaseHTTPRequestHandler):
 				writeLine = f"{cmd} {key},{reqTimestamp}\n"
 				writer.write(writeLine)
 			if int(currTimestamp) - int(reqTimestamp/1000) < 3 :
-				print("xdotool "+cmd +" "+ key)
-				subprocess.call("xdotool "+cmd +" "+ key, shell=True)
+				# print("xdotool "+cmd +" "+ key)
+				subprocess.call("xdotool "+cmd +" "+ key, shell=True, timeout=0.1)
 			
 		#self.wfile.write(self.getHtmlContent()%{"cmd":cmd, "key":key})
 		formatted_string = self.getHtmlContent().replace("%(cmd)s", cmd).replace("%(key)s", key)
@@ -129,13 +139,7 @@ class S(BaseHTTPRequestHandler):
 			   
 			    
 				   
-def run(server_class=HTTPServer, handler_class=S, addr="0.0.0.0", port=443):
-	# server_address = (addr, port)
-	# httpd = server_class(server_address, handler_class)
-
-	# print(f"Starting httpd server on {addr}:{port}")
-	# httpd.serve_forever()
-
+def run(server_class=HTTPServer, handler_class=S, addr="0.0.0.0", port=4443):
 	server_address = (addr, port)
 	httpd = HTTPServer(server_address, handler_class)
 	httpd.socket = ssl.wrap_socket(httpd.socket, server_side=True, certfile='./certificate.crt', keyfile="./privatekey.key", ssl_version=ssl.PROTOCOL_TLS)
@@ -143,6 +147,12 @@ def run(server_class=HTTPServer, handler_class=S, addr="0.0.0.0", port=443):
 	httpd.serve_forever()
 
 
+
+
 if __name__ == "__main__":
-	run()
+	p = mp.Process(target=run, args=())
+	p.start()
+	asyncio.get_event_loop().run_until_complete(wsmain())
+
+
 
