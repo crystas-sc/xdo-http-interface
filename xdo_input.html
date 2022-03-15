@@ -1,25 +1,45 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
+  <head>
+    <style>
+      .op-buttons, .top-items{
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        
+      }
+      .op-buttons button{
+        width: 18rem;
+        font-size: 2em;
+      }
+      .top-items button{
+        font-size: 2em;
+      }
+      .top-items input{
+        width: 100%;
+        font-size: 2em;
+      }
+    </style>
+  </head>
 
 <body>
   <form id="form" method="get" onsubmit="return populateTimestamp()">
     <p>Last command: <span  id="last-command">%(cmd)s %(key)s</span></p>
+    <div class="top-items">
+      <input type="text" name="cmd" value="%(cmd)s" />
+      <input type="text" name="key" value="%(key)s" />
+      <input type="hidden" name="timestamp" value="" />
+      <button type="submit">submit</button>
 
-    <input type="text" name="cmd" value="%(cmd)s" />
-    <input type="text" name="key" value="%(key)s" />
-    <input type="hidden" name="timestamp" value="" />
-    <button type="submit">submit</button>
 
+      <button type="button" onclick="sendClipboardData()">Send clipboard data</button>
 
-    <button type="button" onclick="sendClipboardData()">Send clipboard data</button>
+    </div>
+
+    
     <br />
-    <div style="display=flex">
-      <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioRaiseVolume')">
-        Vol+
-      </button>
-      <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioLowerVolume')">
-        Vol-
-      </button>
+    <div class="op-buttons" >
+      
 
       <button type="button" onClick="btnClickKey('alt+Tab')">alt+Tab</button>
       <button type="button" onClick="btnClickKey('alt+F4')">alt+F4</button>
@@ -29,10 +49,18 @@
       <button type="button" onClick="btnClickMouse(' 0 0 click 3')">
         Right Click
       </button>
+      <button type="button" onClick="btnClickMouse(' 0 0 click 4')">
+        Scroll up
+      </button>
+      <button type="button" onClick="btnClickMouse(' 0 0 click 5')">
+        Scroll down
+      </button>
       <button type="button" onClick="btnClickSetCmd('mousemove_relative --sync ')">
         Mouse Move
       </button>
       <button type="button" onClick="btnClickSetCmd('key')">key cmd</button>
+      <button type="button" onClick="btnClickSetCmd('type')">type cmd</button>
+
 
       <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioMute')">
         Mute
@@ -48,6 +76,12 @@
       </button>
       <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioNext')">
         Next
+      </button>
+      <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioRaiseVolume')">
+        Vol+
+      </button>
+      <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioLowerVolume')">
+        Vol-
       </button>
     </div>
     <br />
@@ -73,15 +107,26 @@
       }
 
       function btnClickKey(value) {
+        if(window.websoc){
+          window.websoc.send(`key ${value}`)
+          return;
+        }
         form.cmd.value = "key";
         form.key.value = value;
+        
         populateTimestamp();
         form.submit();
       }
 
       function btnClickMouse(value) {
+        if(window.websoc){
+          window.websoc.send(`mousemove_relative --sync ${value}`)
+          return;
+        }
+
         form.cmd.value = "mousemove_relative --sync ";
         form.key.value = value;
+        
         populateTimestamp();
         form.submit();
       }
@@ -128,12 +173,20 @@
       trackPadElement.deltaCallBack = (delta) => {
         console.log("delta", delta);
         var xValue = delta.x < 0 ? "-- " + delta.x : delta.x;
+        if(window.websoc){
+          window.websoc.send(`mousemove_relative --sync ${xValue} ${delta.y}`)
+          return;
+        }
         sendFormData(
           createFromData("mousemove_relative --sync ", `${xValue} ${delta.y}`)
         );
       };
       trackPadElement.leftClickCallBack = (touchPoint) => {
         console.log("left click - touchPoint", touchPoint);
+        if(window.websoc){
+          window.websoc.send(`mousemove_relative --sync 0 0 click 1`)
+          return;
+        }
         sendFormData(
           createFromData("mousemove_relative --sync ", ` 0 0 click 1`)
         );
@@ -141,6 +194,10 @@
 
       trackPadElement.rightClickCallBack = (touchPoint) => {
         console.log("right click - touchPoint", touchPoint);
+        if(window.websoc){
+          window.websoc.send(`mousemove_relative --sync 0 0 click 3`)
+          return;
+        }
         sendFormData(
           createFromData("mousemove_relative --sync ", ` 0 0 click 3`)
         );
@@ -245,6 +302,34 @@
         }
       }
 
+    </script>
+
+    <script>
+      let socket = new WebSocket(`wss://${location.hostname}:8765`);
+
+socket.onopen = function(e) {
+   console.log("Web socket connected");
+   alert("web socket connected");
+   window.websoc=socket;
+};
+socket.onmessage = function(event) {
+  console.log(`[message] Data received from server: ${event.data}`);
+};
+
+socket.onclose = function(event) {
+  window.websoc= null;
+  if (event.wasClean) {
+    alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+  } else {
+    // e.g. server process killed or network down
+    // event.code is usually 1006 in this case
+    alert('[close] Connection died');
+  }
+};
+
+socket.onerror = function(error) {
+  alert(`[error] ${error.message}`);
+};
     </script>
   
 </body>
