@@ -42,6 +42,8 @@
       
 
       <button type="button" onClick="btnClickKey('alt+Tab')">alt+Tab</button>
+      <button type="button" onClick="btnClickKey('ctrl+F4')">ctrl+F4</button>
+
       <button type="button" onClick="btnClickKey('alt+F4')">alt+F4</button>
       <button type="button" onClick="btnClickMouse(' 0 0 click 1')">
         Left Click
@@ -49,10 +51,10 @@
       <button type="button" onClick="btnClickMouse(' 0 0 click 3')">
         Right Click
       </button>
-      <button type="button" onClick="btnClickMouse(' 0 0 click 4')">
+      <button type="button" onmousedown="starttimer(event,' 0 0 click 4')" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,' 0 0 click 4')" ontouchend="stoptimer()" onClick1="btnClickMouse(' 0 0 click 4')">
         Scroll up
       </button>
-      <button type="button" onClick="btnClickMouse(' 0 0 click 5')">
+      <button type="button" onmousedown="starttimer(event,' 0 0 click 5')" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,' 0 0 click 5')" ontouchend="stoptimer()" onClick1="btnClickMouse(' 0 0 click 5')">
         Scroll down
       </button>
       <button type="button" onClick="btnClickSetCmd('mousemove_relative --sync ')">
@@ -77,11 +79,14 @@
       <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioNext')">
         Next
       </button>
-      <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioRaiseVolume')">
+      <button type="button" onmousedown="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" ontouchend="stoptimer()" onClick1="btnClickKey('--clearmodifiers XF86AudioRaiseVolume')">
         Vol+
       </button>
-      <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioLowerVolume')">
+      <button type="button" onmousedown="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" ontouchend="stoptimer()" onClick1="btnClickKey('--clearmodifiers XF86AudioLowerVolume')">
         Vol-
+      </button>
+      <button type="button" onClick="btnClickKey('Return')">
+        enter
       </button>
     </div>
     <br />
@@ -95,11 +100,35 @@
     <p>Upload File: <input type = "file" name = "file" /></p>
     <p><input type = "submit" value = "Upload" /></p>
   </form>
+  <script>
+    let timerId;
+    let afterNumberOfTimers = 10;
+    let counter=0;
+    function starttimer(e,cmd, fn=btnClickMouse){
+      if(e){
+        e.preventDefault()
+      }
+      
+      if(counter == 0){
+        console.log("run cmd",cmd)
+        fn(cmd)
+      }
+      counter++; 
+      if(counter == afterNumberOfTimers){
+        counter = 0;
+      }
+      
+      timerId = requestAnimationFrame(()=>{starttimer(null,cmd, fn)})
+    }
+    function stoptimer(){
+      cancelAnimationFrame(timerId)
+    }
+  </script>
 
     <script>
       var form = document.getElementById("form");
 
-      function populateTimestamp() {
+      function populateTimestamp() {z
         form.timestamp.value =
           new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000;
         console.log("form.timestamp.value", form.timestamp.value);
@@ -120,6 +149,7 @@
 
       function btnClickMouse(value) {
         if(window.websoc){
+          console.log("value",value)
           window.websoc.send(`mousemove_relative --sync ${value}`)
           return;
         }
