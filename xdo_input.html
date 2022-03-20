@@ -1,30 +1,35 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-  <head>
-    <style>
-      .op-buttons, .top-items{
-        display: flex;
-        flex-wrap: wrap;
-        width: 100%;
-        
-      }
-      .op-buttons button{
-        width: 18rem;
-        font-size: 2em;
-      }
-      .top-items button{
-        font-size: 2em;
-      }
-      .top-items input{
-        width: 100%;
-        font-size: 2em;
-      }
-    </style>
-  </head>
+
+<head>
+  <style>
+    .op-buttons,
+    .top-items {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+
+    }
+
+    .op-buttons button {
+      width: 18rem;
+      font-size: 2em;
+    }
+
+    .top-items button {
+      font-size: 2em;
+    }
+
+    .top-items input {
+      width: 100%;
+      font-size: 2em;
+    }
+  </style>
+</head>
 
 <body>
   <form id="form" method="get" onsubmit="return populateTimestamp()">
-    <p>Last command: <span  id="last-command">%(cmd)s %(key)s</span></p>
+    <p>Last command: <span id="last-command">%(cmd)s %(key)s</span></p>
     <div class="top-items">
       <input type="text" name="cmd" value="%(cmd)s" />
       <input type="text" name="key" value="%(key)s" />
@@ -36,10 +41,10 @@
 
     </div>
 
-    
+
     <br />
-    <div class="op-buttons" >
-      
+    <div class="op-buttons">
+
 
       <button type="button" onClick="btnClickKey('alt+Tab')">alt+Tab</button>
       <button type="button" onClick="btnClickKey('ctrl+F4')">ctrl+F4</button>
@@ -51,10 +56,14 @@
       <button type="button" onClick="btnClickMouse(' 0 0 click 3')">
         Right Click
       </button>
-      <button type="button" onmousedown="starttimer(event,' 0 0 click 4')" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,' 0 0 click 4')" ontouchend="stoptimer()" onClick1="btnClickMouse(' 0 0 click 4')">
+      <button type="button" onmousedown="starttimer(event,' 0 0 click 4')" onmouseleave="stoptimer()"
+        onmouseup="stoptimer()" ontouchstart="starttimer(event,' 0 0 click 4')" ontouchend="stoptimer()"
+        onClick1="btnClickMouse(' 0 0 click 4')">
         Scroll up
       </button>
-      <button type="button" onmousedown="starttimer(event,' 0 0 click 5')" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,' 0 0 click 5')" ontouchend="stoptimer()" onClick1="btnClickMouse(' 0 0 click 5')">
+      <button type="button" onmousedown="starttimer(event,' 0 0 click 5')" onmouseleave="stoptimer()"
+        onmouseup="stoptimer()" ontouchstart="starttimer(event,' 0 0 click 5')" ontouchend="stoptimer()"
+        onClick1="btnClickMouse(' 0 0 click 5')">
         Scroll down
       </button>
       <button type="button" onClick="btnClickSetCmd('mousemove_relative --sync ')">
@@ -79,10 +88,16 @@
       <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioNext')">
         Next
       </button>
-      <button type="button" onmousedown="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" ontouchend="stoptimer()" onClick1="btnClickKey('--clearmodifiers XF86AudioRaiseVolume')">
+      <button type="button" onmousedown="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)"
+        onmouseleave="stoptimer()" onmouseup="stoptimer()"
+        ontouchstart="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" ontouchend="stoptimer()"
+        onClick1="btnClickKey('--clearmodifiers XF86AudioRaiseVolume')">
         Vol+
       </button>
-      <button type="button" onmousedown="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" ontouchend="stoptimer()" onClick1="btnClickKey('--clearmodifiers XF86AudioLowerVolume')">
+      <button type="button" onmousedown="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)"
+        onmouseleave="stoptimer()" onmouseup="stoptimer()"
+        ontouchstart="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" ontouchend="stoptimer()"
+        onClick1="btnClickKey('--clearmodifiers XF86AudioLowerVolume')">
         Vol-
       </button>
       <button type="button" onClick="btnClickKey('Return')">
@@ -91,277 +106,277 @@
     </div>
     <br />
     <br />
-    
+
     <br />
     <track-pad></track-pad>
   </form>
   <a href="/fileserve" target="_blank">Static files</a>
-  <form target="_blank" enctype = "multipart/form-data" action = "/fileupload" method = "post">
-    <p>Upload File: <input type = "file" name = "file" /></p>
-    <p><input type = "submit" value = "Upload" /></p>
+  <form target="_blank" enctype="multipart/form-data" action="/fileupload" method="post">
+    <p>Upload File: <input type="file" name="file" /></p>
+    <p><input type="submit" value="Upload" /></p>
   </form>
   <script>
     let timerId;
     let afterNumberOfTimers = 10;
-    let counter=0;
-    function starttimer(e,cmd, fn=btnClickMouse){
-      if(e){
+    let counter = 0;
+    function starttimer(e, cmd, fn = btnClickMouse) {
+      if (e) {
         e.preventDefault()
       }
-      
-      if(counter == 0){
-        console.log("run cmd",cmd)
+
+      if (counter == 0) {
+        console.log("run cmd", cmd)
         fn(cmd)
       }
-      counter++; 
-      if(counter == afterNumberOfTimers){
+      counter++;
+      if (counter == afterNumberOfTimers) {
         counter = 0;
       }
-      
-      timerId = requestAnimationFrame(()=>{starttimer(null,cmd, fn)})
+
+      timerId = requestAnimationFrame(() => { starttimer(null, cmd, fn) })
     }
-    function stoptimer(){
+    function stoptimer() {
       cancelAnimationFrame(timerId)
     }
   </script>
 
-    <script>
-      var form = document.getElementById("form");
+  <script>
+    var form = document.getElementById("form");
 
-      function populateTimestamp() {z
-        form.timestamp.value =
-          new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000;
-        console.log("form.timestamp.value", form.timestamp.value);
-        return true;
+    function populateTimestamp() {
+      form.timestamp.value =
+        new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000;
+      console.log("form.timestamp.value", form.timestamp.value);
+      return true;
+    }
+
+    function btnClickKey(value) {
+      if (window.websoc) {
+        window.websoc.send(`key ${value}`)
+        return;
+      }
+      form.cmd.value = "key";
+      form.key.value = value;
+
+      populateTimestamp();
+      form.submit();
+    }
+
+    function btnClickMouse(value) {
+      if (window.websoc) {
+        console.log("value", value)
+        window.websoc.send(`mousemove_relative --sync ${value}`)
+        return;
       }
 
-      function btnClickKey(value) {
-        if(window.websoc){
-          window.websoc.send(`key ${value}`)
-          return;
-        }
-        form.cmd.value = "key";
-        form.key.value = value;
-        
-        populateTimestamp();
-        form.submit();
+      form.cmd.value = "mousemove_relative --sync ";
+      form.key.value = value;
+
+      populateTimestamp();
+      form.submit();
+    }
+
+    function btnClickSetCmd(cmd) {
+      form.cmd.value = cmd;
+      form.key.value = "";
+    }
+  </script>
+  <style>
+    button {
+      min-height: 70px;
+      min-width: 100px;
+      margin: 10px;
+    }
+  </style>
+
+  <script>
+    function createFromData(cmd, key) {
+      populateTimestamp();
+      form.cmd.value = cmd;
+      form.key.value = key;
+      document.getElementById("last-command").innerHTML = `${cmd ? cmd : ""} ${key ? key : ""}`;
+      var formData = new FormData(form);
+      //formData.append("cmd", cmd);
+      //formData.append("key", key);
+      return formData;
+    }
+
+    function sendFormData(formData) {
+      const data = [...formData.entries()];
+      const asString = data
+        .map(
+          (x) => `${encodeURIComponent(x[0])}=${encodeURIComponent(x[1])}`
+        )
+        .join("&");
+      console.log(asString);
+      fetch("/?" + asString, {
+        method: "GET",
+      });
+    }
+
+    var trackPadElement = document.getElementsByTagName("track-pad")[0];
+    trackPadElement.deltaCallBack = (delta) => {
+      console.log("delta", delta);
+      var xValue = delta.x < 0 ? "-- " + delta.x : delta.x;
+      if (window.websoc) {
+        window.websoc.send(`mousemove_relative --sync ${xValue} ${delta.y}`)
+        return;
+      }
+      sendFormData(
+        createFromData("mousemove_relative --sync ", `${xValue} ${delta.y}`)
+      );
+    };
+    trackPadElement.leftClickCallBack = (touchPoint) => {
+      console.log("left click - touchPoint", touchPoint);
+      if (window.websoc) {
+        window.websoc.send(`mousemove_relative --sync 0 0 click 1`)
+        return;
+      }
+      sendFormData(
+        createFromData("mousemove_relative --sync ", ` 0 0 click 1`)
+      );
+    };
+
+    trackPadElement.rightClickCallBack = (touchPoint) => {
+      console.log("right click - touchPoint", touchPoint);
+      if (window.websoc) {
+        window.websoc.send(`mousemove_relative --sync 0 0 click 3`)
+        return;
+      }
+      sendFormData(
+        createFromData("mousemove_relative --sync ", ` 0 0 click 3`)
+      );
+    };
+    class Trackpad extends HTMLElement {
+      constructor() {
+        super();
       }
 
-      function btnClickMouse(value) {
-        if(window.websoc){
-          console.log("value",value)
-          window.websoc.send(`mousemove_relative --sync ${value}`)
-          return;
-        }
-
-        form.cmd.value = "mousemove_relative --sync ";
-        form.key.value = value;
-        
-        populateTimestamp();
-        form.submit();
+      connectedCallback() {
+        this.render();
       }
 
-      function btnClickSetCmd(cmd) {
-        form.cmd.value = cmd;
-        form.key.value = "";
-      }
-    </script>
-    <style>
-      button {
-        min-height: 70px;
-        min-width: 100px;
-        margin: 10px;
-      }
-    </style>
+      render() {
+        const div = document.createElement("div");
+        div.style.width = "100%";
+        div.style.height = "500px";
+        div.style.backgroundColor = "beige";
+        div.ontouchmove = this.handleTouchMove;
+        div.ontouchstart = this.handleTouchStart;
+        div.ontouchend = this.handleTouchEnd;
+        this.appendChild(div);
 
-    <script>
-      function createFromData(cmd, key) {
-        populateTimestamp();
-        form.cmd.value = cmd;
-        form.key.value = key;
-        document.getElementById("last-command").innerHTML= `${cmd? cmd:""} ${key? key:""}`;
-        var formData = new FormData(form);
-        //formData.append("cmd", cmd);
-        //formData.append("key", key);
-        return formData;
+        //this.innerHTML = `<h1>Hello, World!</h1>`;
       }
-
-      function sendFormData(formData) {
-        const data = [...formData.entries()];
-        const asString = data
-          .map(
-            (x) => `${encodeURIComponent(x[0])}=${encodeURIComponent(x[1])}`
-          )
-          .join("&");
-        console.log(asString);
-        fetch("/?" + asString, {
-          method: "GET",
-        });
-      }
-
-      var trackPadElement = document.getElementsByTagName("track-pad")[0];
-      trackPadElement.deltaCallBack = (delta) => {
-        console.log("delta", delta);
-        var xValue = delta.x < 0 ? "-- " + delta.x : delta.x;
-        if(window.websoc){
-          window.websoc.send(`mousemove_relative --sync ${xValue} ${delta.y}`)
-          return;
-        }
-        sendFormData(
-          createFromData("mousemove_relative --sync ", `${xValue} ${delta.y}`)
-        );
+      start = {
+        x: 0,
+        y: 0,
       };
-      trackPadElement.leftClickCallBack = (touchPoint) => {
-        console.log("left click - touchPoint", touchPoint);
-        if(window.websoc){
-          window.websoc.send(`mousemove_relative --sync 0 0 click 1`)
-          return;
-        }
-        sendFormData(
-          createFromData("mousemove_relative --sync ", ` 0 0 click 1`)
-        );
+      move = {
+        x: 0,
+        y: 0,
       };
-
-      trackPadElement.rightClickCallBack = (touchPoint) => {
-        console.log("right click - touchPoint", touchPoint);
-        if(window.websoc){
-          window.websoc.send(`mousemove_relative --sync 0 0 click 3`)
-          return;
-        }
-        sendFormData(
-          createFromData("mousemove_relative --sync ", ` 0 0 click 3`)
-        );
-      };
-      class Trackpad extends HTMLElement {
-        constructor() {
-          super();
-        }
-
-        connectedCallback() {
-          this.render();
-        }
-
-        render() {
-          const div = document.createElement("div");
-          div.style.width = "100%";
-          div.style.height = "500px";
-          div.style.backgroundColor = "beige";
-          div.ontouchmove = this.handleTouchMove;
-          div.ontouchstart = this.handleTouchStart;
-          div.ontouchend = this.handleTouchEnd;
-          this.appendChild(div);
-
-          //this.innerHTML = `<h1>Hello, World!</h1>`;
-        }
-        start = {
+      handleTouchStart = (event) => {
+        event.preventDefault();
+        this.start.x = event.touches[0].pageX;
+        this.start.y = event.touches[0].pageY;
+        this.move = {
           x: 0,
           y: 0,
         };
-        move = {
+      };
+
+      handleTouchEnd = (event) => {
+        event.preventDefault();
+        this.move = {
           x: 0,
           y: 0,
         };
-        handleTouchStart = (event) => {
-          event.preventDefault();
-          this.start.x = event.touches[0].pageX;
-          this.start.y = event.touches[0].pageY;
-          this.move = {
-            x: 0,
-            y: 0,
-          };
-        };
+        window.touch = "end";
 
-        handleTouchEnd = (event) => {
-          event.preventDefault();
-          this.move = {
-            x: 0,
-            y: 0,
-          };
-          window.touch = "end";
+        if (event.touches.length > 0) {
+          this.rightClickCallBack(this.start);
+        } else if (
+          this.start.x == event.changedTouches[0].pageX &&
+          this.start.y == event.changedTouches[0].pageY
+        ) {
+          this.leftClickCallBack(this.move);
+        }
+      };
 
-          if (event.touches.length > 0) {
-            this.rightClickCallBack(this.start);
-          } else if (
-            this.start.x == event.changedTouches[0].pageX &&
-            this.start.y == event.changedTouches[0].pageY
-          ) {
-            this.leftClickCallBack(this.move);
-          }
-        };
+      handleTouchMove = (event) => {
+        event.preventDefault();
+        window.touch = "move";
+        var firstTouch = event.changedTouches[0];
+        var endX = firstTouch.pageX;
+        var endY = firstTouch.pageY;
+        var lastMove = this.move;
+        var max = Math.max(
+          Math.abs(endX - lastMove.x),
+          Math.abs(endY - lastMove.y)
+        );
 
-        handleTouchMove = (event) => {
-          event.preventDefault();
-          window.touch = "move";
-          var firstTouch = event.changedTouches[0];
-          var endX = firstTouch.pageX;
-          var endY = firstTouch.pageY;
-          var lastMove = this.move;
-          var max = Math.max(
-            Math.abs(endX - lastMove.x),
-            Math.abs(endY - lastMove.y)
-          );
-
-          if (max > 1 && (lastMove.x != 0 || lastMove.y !== 0)) {
-            this.deltaCallBack({
-              x: endX - lastMove.x,
-              y: endY - lastMove.y,
-            });
-          }
-          this.move = {
-            x: endX,
-            y: endY,
-          };
-        };
-      }
-
-      customElements.define("track-pad", Trackpad);
-    </script>
-
-    <script>
-      function sendClipboardData() {
-        try {
-          navigator.clipboard.readText().then(function (data) {
-            console.log("Copied String ", data);
-            sendFormData(createFromData(data, ""));
-          }).catch((e) => {
-            alert(e.message)
+        if (max > 1 && (lastMove.x != 0 || lastMove.y !== 0)) {
+          this.deltaCallBack({
+            x: endX - lastMove.x,
+            y: endY - lastMove.y,
           });
-
-        } catch (e) {
-          alert(e.message)
         }
+        this.move = {
+          x: endX,
+          y: endY,
+        };
+      };
+    }
+
+    customElements.define("track-pad", Trackpad);
+  </script>
+
+  <script>
+    function sendClipboardData() {
+      try {
+        navigator.clipboard.readText().then(function (data) {
+          console.log("Copied String ", data);
+          sendFormData(createFromData(data, ""));
+        }).catch((e) => {
+          alert(e.message)
+        });
+
+      } catch (e) {
+        alert(e.message)
       }
+    }
 
-    </script>
+  </script>
 
-    <script>
-      let socket = new WebSocket(`wss://${location.hostname}:8765`);
+  <script>
+    let socket = new WebSocket(`wss://${location.hostname}:8765`);
 
-socket.onopen = function(e) {
-   console.log("Web socket connected");
-   alert("web socket connected");
-   window.websoc=socket;
-};
-socket.onmessage = function(event) {
-  console.log(`[message] Data received from server: ${event.data}`);
-};
+    socket.onopen = function (e) {
+      console.log("Web socket connected");
+      alert("web socket connected");
+      window.websoc = socket;
+    };
+    socket.onmessage = function (event) {
+      console.log(`[message] Data received from server: ${event.data}`);
+    };
 
-socket.onclose = function(event) {
-  window.websoc= null;
-  if (event.wasClean) {
-    alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-  } else {
-    // e.g. server process killed or network down
-    // event.code is usually 1006 in this case
-    alert('[close] Connection died');
-  }
-};
+    socket.onclose = function (event) {
+      window.websoc = null;
+      if (event.wasClean) {
+        alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+      } else {
+        // e.g. server process killed or network down
+        // event.code is usually 1006 in this case
+        alert('[close] Connection died');
+      }
+    };
 
-socket.onerror = function(error) {
-  alert(`[error] ${error.message}`);
-};
-    </script>
-  
+    socket.onerror = function (error) {
+      alert(`[error] ${error.message}`);
+    };
+  </script>
+
 </body>
 
 </html>
