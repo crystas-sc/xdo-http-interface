@@ -252,6 +252,7 @@
       function btnClickSetCmd(cmd) {
         form.cmd.value = cmd;
         form.key.value = "";
+        form.key.focus();
       }
     </script>
     <style>
@@ -291,6 +292,7 @@
       trackPadElement.deltaCallBack = (delta) => {
         console.log("delta", delta);
         var xValue = delta.x < 0 ? "-- " + delta.x : delta.x;
+        xValue = delta.x;
         if(window.websoc){
           window.websoc.send(`mousemove_relative --sync ${xValue} ${delta.y}`)
           return;
