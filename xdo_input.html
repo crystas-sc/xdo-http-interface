@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <link href="/tailwind-1.9.6.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" integrity="sha512-10/jx2EXwxxWqCLX/hHth/vu2KY3jCF70dCQB8TSgNjbCVAC/8vai53GfMDrO2Emgwccf2pJqxct9ehpzG+MTw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
       .op-buttons, .top-items{
@@ -11,21 +11,30 @@
         
       }
       .op-buttons button{
-        width: 18rem;
-        font-size: 2em;
+        width: 12rem;
+        /* font-size: 2em; */
         
       }
       .top-items button{
-        font-size: 2em;
+        /* font-size: 2em; */
       }
       .top-items input{
         width: 100%;
-        font-size: 2em;
+        /* font-size: 2em; */
+      }
+      :root{
+         font-size : clamp(1rem, 2vw, 2rem);
       }
     </style>
   </head>
 
 <body>
+  <div class="hidden bg-red-600 shadow-lg mx-auto w-96 max-w-full text-sm pointer-events-auto bg-clip-padding rounded-lg block mb-3" id="alert" role="alert" aria-live="assertive" aria-atomic="true" data-mdb-autohide="false">
+    
+    <div class="p-3 bg-red-600 rounded-b-lg break-words text-white">
+      WebSocket not connected
+    </div>
+  </div>
   <form id="form" method="get" onsubmit="return populateTimestamp()">
     <p class="form-label inline-block mb-2 text-gray-700 text-xl">Last command: <span  id="last-command">%(cmd)s %(key)s</span></p>
     <div class="top-items">
@@ -147,15 +156,18 @@
       
     </div>
 
+    <br/>
+    <track-pad></track-pad>
+    <br/>
     <div class="flex justify-around ">
       
       
-        <button class="bg-teal-800 focus:outline-none text-white text-5xl p-3 px-8 shadow-xl active:shadow-lg"
+        <button class="bg-teal-800 focus:outline-none text-white text-3xl p-3 px-8 shadow-xl active:shadow-lg"
           onmousedown="starttimer(event,' 0 0 click 4')" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,' 0 0 click 4')" ontouchend="stoptimer()"
           >
           Scroll <i class="fa fa-arrow-up-long fa-1x text-white"></i>
         </button> 
-        <button class="bg-blue-800 focus:outline-none text-white text-5xl p-3 px-8 w-1/6 rounded-full shadow-xl active:shadow-lg" 
+        <button class="bg-blue-800 focus:outline-none text-white text-3xl p-3 px-8 w-1/6 rounded-full shadow-xl active:shadow-lg" 
           onmousedown="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" ontouchend="stoptimer()" >
          <i class="fa fa-volume-high fa-1x text-white"></i>
         </button>
@@ -163,27 +175,29 @@
     <div class="flex justify-around ">
       
       
-      <button class="bg-teal-800 focus:outline-none text-white text-5xl p-3 px-8 shadow-xl active:shadow-lg"
+      <button class="bg-teal-800 focus:outline-none text-white text-3xl p-3 px-8 shadow-xl active:shadow-lg"
         onmousedown="starttimer(event,' 0 0 click 5')" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,' 0 0 click 5')" ontouchend="stoptimer()"
         >Scroll 
         <i class="fa fa-arrow-down-long fa-1x text-white"></i>
       </button> 
-      <button class="bg-blue-800 focus:outline-none text-white text-5xl p-3 px-8 w-1/6 rounded-full shadow-xl active:shadow-lg"
+      <button class="bg-blue-800 focus:outline-none text-white text-3xl p-3 px-8 w-1/6 rounded-full shadow-xl active:shadow-lg"
         onmousedown="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" ontouchend="stoptimer()" > 
         <i class="fa fa-volume-low fa-1x text-white"></i>
       </button>
   </div>
-    <br />
-    <br />
+    
     
     <br />
-    <track-pad></track-pad>
   </form>
   <a href="/fileserve" target="_blank">Static files</a>
   <form target="_blank" enctype = "multipart/form-data" action = "/fileupload" method = "post">
     <p>Upload File: <input type = "file" name = "file" /></p>
     <p><input type = "submit" value = "Upload" /></p>
   </form>
+
+  
+
+
   <script>
     let timerId;
     let afterNumberOfTimers = 10;
@@ -425,31 +439,44 @@
     </script>
 
     <script>
+      let alertDiv = document.getElementById("alert");
+      function connectToWebSocket(){
+        // alertDiv.style.display = "block"
+        if(window.websoc) return;
       let socket = new WebSocket(`wss://${location.hostname}:8765`);
 
-socket.onopen = function(e) {
-   console.log("Web socket connected");
-   alert("web socket connected");
-   window.websoc=socket;
-};
-socket.onmessage = function(event) {
-  console.log(`[message] Data received from server: ${event.data}`);
-};
+        socket.onopen = function(e) {
+          console.log("Web socket connected");
+          //  alert("web socket connected");
+          alertDiv.style.display = "none"
+          window.websoc=socket;
+        };
+        socket.onmessage = function(event) {
+          console.log(`[message] Data received from server: ${event.data}`);
+        };
 
-socket.onclose = function(event) {
-  window.websoc= null;
-  if (event.wasClean) {
-    alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-  } else {
-    // e.g. server process killed or network down
-    // event.code is usually 1006 in this case
-    alert('[close] Connection died');
-  }
-};
+        socket.onclose = function(event) {
+          window.websoc= null;
+          if (event.wasClean) {
+            alertDiv.style.display = "block"
+            // alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+          } else {
+            // e.g. server process killed or network down
+            // event.code is usually 1006 in this case
+            // alert('[close] Connection died');
+            alertDiv.style.display = "block"
+          }
+        };
 
-socket.onerror = function(error) {
-  alert(`[error] ${error.message}`);
-};
+        socket.onerror = function(error) {
+          alertDiv.style.display = "block"
+          // alert(`[error] ${error.message}`);
+        };
+      }
+      connectToWebSocket();
+      window.addEventListener("visibilitychange", function(event) {
+        connectToWebSocket();
+        }, false);
     </script>
   
 </body>
