@@ -1,6 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
+    <link rel="manifest" href="manifest.json" />
+
     <link href="/tailwind-1.9.6.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" integrity="sha512-10/jx2EXwxxWqCLX/hHth/vu2KY3jCF70dCQB8TSgNjbCVAC/8vai53GfMDrO2Emgwccf2pJqxct9ehpzG+MTw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
@@ -188,6 +190,41 @@
     
     
     <br />
+    <div style="display:grid; grid-template-columns:auto auto auto">
+      <button style="grid-column:1/2" class=" h-24 bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" onClick="btnClickKey('Escape')">
+        Escape
+      </button>
+      <button style="grid-column:2/3" class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" 
+      onmousedown="starttimer(event,'Up', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'Up', btnClickKey)" ontouchend="stoptimer()"  
+
+      >
+        up
+      </button>
+      <button style="grid-column:3/4" class=" h-24 bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" onClick="btnClickKey('KP_Space')">
+        Space
+      </button>
+      <button style="grid-column:1/2"  class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" 
+      onmousedown="starttimer(event,'Left', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'Left', btnClickKey)" ontouchend="stoptimer()"  
+
+      >
+        left
+      </button>
+       
+      <button style="grid-column:2/3"  class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" onClick="btnClickKey('Return')">
+        enter
+      </button>
+      <button  style="grid-column:3/4"  class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" 
+      onmousedown="starttimer(event,'Right', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'Right', btnClickKey)" ontouchend="stoptimer()"  
+            >
+        right
+      </button>
+      <button style="grid-column:2/3"  class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" 
+      onmousedown="starttimer(event,'Down', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'Down', btnClickKey)" ontouchend="stoptimer()"  
+
+      >
+        down
+      </button>
+    </div>
   </form>
   <a href="/fileserve" target="_blank">Static files</a>
   <form target="_blank" enctype = "multipart/form-data" action = "/fileupload" method = "post">
@@ -477,6 +514,16 @@
       window.addEventListener("visibilitychange", function(event) {
         connectToWebSocket();
         }, false);
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function() {
+          navigator.serviceWorker
+            .register("/serviceWorker.js")
+            .then(res => console.log("service worker registered"))
+            .catch(err => console.log("service worker not registered", err))
+        })
+      }
     </script>
   
 </body>
