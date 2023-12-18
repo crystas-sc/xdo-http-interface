@@ -1,531 +1,191 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-  <head>
-    <link rel="manifest" href="/assets/manifest.json" />
+#!/usr/bin/env python
+"""
+Very simple HTTP server in python interfacing with xdotool
 
-    <link href="/assets/tailwind-1.9.6.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" integrity="sha512-10/jx2EXwxxWqCLX/hHth/vu2KY3jCF70dCQB8TSgNjbCVAC/8vai53GfMDrO2Emgwccf2pJqxct9ehpzG+MTw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style>
-      .op-buttons, .top-items{
-        display: flex;
-        flex-wrap: wrap;
-        width: 100%;
-        
-      }
-      .op-buttons button{
-        width: 12rem;
-        /* font-size: 2em; */
-        
-      }
-      .top-items button{
-        /* font-size: 2em; */
-      }
-      .top-items input{
-        width: 100%;
-        /* font-size: 2em; */
-      }
-      :root{
-         font-size : clamp(1rem, 2vw, 2rem);
-      }
-    </style>
-  </head>
+"""
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import urllib
+import subprocess
+import os
+import datetime
+import ssl
+import os
+from pathlib import Path
+import cgi
+import shutil
+from asyncio_websocket import main as wsmain
+import asyncio
+import mimetypes
 
-<body>
-  <div class="hidden bg-red-600 shadow-lg mx-auto w-96 max-w-full text-sm pointer-events-auto bg-clip-padding rounded-lg block mb-3" id="alert" role="alert" aria-live="assertive" aria-atomic="true" data-mdb-autohide="false">
-    
-    <div class="p-3 bg-red-600 rounded-b-lg break-words text-white">
-      WebSocket not connected
-    </div>
-  </div>
-  <form id="form" method="get" onsubmit="return populateTimestamp()">
-    <p class="form-label inline-block mb-2 text-gray-700 text-xl">Last command: <span  id="last-command">%(cmd)s %(key)s</span></p>
-    <div class="top-items">
-      <input type="text" name="cmd" value="%(cmd)s" class="form-control
-      block
-      w-full
-      px-4
-      py-2
-      text-xl
-      font-normal
-      text-gray-700
-      bg-white bg-clip-padding
-      border border-solid border-gray-300
-      rounded
-      transition
-      ease-in-out
-      m-0
-      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" />
-      
-      <input type="text" name="key" value="%(key)s" class="form-control mt-6
-      block
-      w-full
-      px-4
-      py-2
-      text-xl
-      font-normal
-      text-gray-700
-      bg-white bg-clip-padding
-      border border-solid border-gray-300
-      rounded
-      transition
-      ease-in-out
-      m-0
-      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" />
-      <input type="hidden" name="timestamp" value="" />
-      <button type="submit" class="inline-block px-6 py-2.5 bg-indigo-500  text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out" >submit</button>
+import multiprocessing as mp
 
 
-      <button type="button" class="inline-block px-6 py-2.5 bg-indigo-500  text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out" onclick="sendClipboardData()">Send clipboard data</button>
-
-    </div>
-
-    
-    <br />
-    <div class="op-buttons flex justify-around " >
-      
-
-      <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg" onClick="btnClickKey('alt+Tab')">alt+Tab</button>
-      <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg" onClick="btnClickKey('ctrl+F4')">ctrl+F4</button>
-
-      <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"  onClick="btnClickKey('alt+F4')">alt+F4</button>
-      <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"  onClick="btnClickMouse(' 0 0 click 1')">
-        Left Click
-      </button>
-      <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"  onClick="btnClickMouse(' 0 0 click 3')">
-        Right Click
-      </button>
-      <!--
-      <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"  onmousedown="starttimer(event,' 0 0 click 4')" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,' 0 0 click 4')" ontouchend="stoptimer()" onClick1="btnClickMouse(' 0 0 click 4')">
-        Scroll up
-      </button>
-      <button type="button"  class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"  onmousedown="starttimer(event,' 0 0 click 5')" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,' 0 0 click 5')" ontouchend="stoptimer()" onClick1="btnClickMouse(' 0 0 click 5')">
-        Scroll down
-      </button>
-      
-      <button type="button"  class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"  onClick="btnClickSetCmd('mousemove_relative --sync ')">
-        Mouse Move
-      </button>
-      -->
-      <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"  onClick="btnClickSetCmd('key')">key cmd</button>
-      <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"  onClick="btnClickSetCmd('type')">type cmd</button>
 
 
-      <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"  onClick="btnClickKey('--clearmodifiers XF86AudioMute')">
-        Mute
-      </button>
-      <!-- <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioPlay')">
-        Play
-      </button>
-      <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioStop')">
-        Stop
-      </button>
-      <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioPrev')">
-        Prev
-      </button>
-      <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioNext')">
-        Next
-      </button>
-      <button type="button" onmousedown="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" ontouchend="stoptimer()" onClick1="btnClickKey('--clearmodifiers XF86AudioRaiseVolume')">
-        Vol+
-      </button>
-      <button type="button" onmousedown="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" ontouchend="stoptimer()" onClick1="btnClickKey('--clearmodifiers XF86AudioLowerVolume')">
-        Vol-
-      </button> -->
-      <button class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg" type="button" onClick="btnClickKey('Return')">
-        enter
-      </button>
+class S(BaseHTTPRequestHandler):
+	base_static_file_path = os.path.dirname(os.path.abspath(__file__))+'/static_files'
+	base_static_file_path = "/initrd/mnt/dev_save/songs/sn"
+	#base_static_file_path =  "/dev/null"   #"/home/spot/Downloads/sn"
+	base_static_file_path = "/home/spot/Downloads/sn"
+	upload_file_path = os.path.dirname(os.path.abspath(__file__))+'/static_files/uploads'
+	#upload_file_path = "/dev/null"
+	
+	def _set_headers(self):
+		self.send_response(200)
+		self.send_header("Content-type", "text/html")
+		self.end_headers()
 
-     
-        
-      
-    </div>
-    <div class="flex justify-around ">
-      
-      
-        
-        <button type="button" class="w-24 h-24 rounded-full bg-blue-500 focus:outline-none shadow-xl active:shadow-lg" onClick="btnClickKey('--clearmodifiers XF86AudioPlay')">
-          <i class="fa fa-play fa-2x text-white"></i>
-        </button> 
-        <button type="button"  class="w-24 h-24 rounded-full bg-blue-500 focus:outline-none shadow-xl active:shadow-lg" onClick="btnClickKey('--clearmodifiers XF86AudioStop')">
-          <i class="fa fa-stop fa-2x text-white"></i>
-        </button> 
-        <button type="button"  class="w-24 h-24 rounded-full bg-blue-500 focus:outline-none shadow-xl active:shadow-lg" onClick="btnClickKey('--clearmodifiers XF86AudioPrev')">
-          <i class="fa fa-backward-step fa-2x text-white"></i>
-        </button> 
-        <button type="button"  class="w-24 h-24 rounded-full bg-blue-500 focus:outline-none shadow-xl active:shadow-lg" onClick="btnClickKey('--clearmodifiers XF86AudioNext')">
-          <i class="fa fa-forward-step fa-2x text-white"></i>
-        </button>
-      
-    </div>
+	def _html(self, content):
+		return content.encode("utf8")  # NOTE: must return a bytes object!
+		
+	def write_binary_content(self, path):
+		with open(path, 'rb') as infile:
+				d = infile.read(1024)
+				while d:
+					self.wfile.write(d)
+					d = infile.read(1024)
+		
 
-    <br/>
-    <track-pad></track-pad>
-    <br/>
-    <div class="flex justify-around ">
-      
-      
-        <button class="bg-teal-800 focus:outline-none text-white text-3xl p-3 px-8 shadow-xl active:shadow-lg"
-          onmousedown="starttimer(event,' 0 0 click 4')" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,' 0 0 click 4')" ontouchend="stoptimer()"
-          >
-          Scroll <i class="fa fa-arrow-up-long fa-1x text-white"></i>
-        </button> 
-        <button class="bg-blue-800 focus:outline-none text-white text-3xl p-3 px-8 w-1/6 rounded-full shadow-xl active:shadow-lg" 
-          onmousedown="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" ontouchend="stoptimer()" >
-         <i class="fa fa-volume-high fa-1x text-white"></i>
-        </button>
-    </div>
-    <div class="flex justify-around ">
-      
-      
-      <button class="bg-teal-800 focus:outline-none text-white text-3xl p-3 px-8 shadow-xl active:shadow-lg"
-        onmousedown="starttimer(event,' 0 0 click 5')" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,' 0 0 click 5')" ontouchend="stoptimer()"
-        >Scroll 
-        <i class="fa fa-arrow-down-long fa-1x text-white"></i>
-      </button> 
-      <button class="bg-blue-800 focus:outline-none text-white text-3xl p-3 px-8 w-1/6 rounded-full shadow-xl active:shadow-lg"
-        onmousedown="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" ontouchend="stoptimer()" > 
-        <i class="fa fa-volume-low fa-1x text-white"></i>
-      </button>
-  </div>
-    
-    
-    <br />
-    <div style="display:grid; grid-template-columns:auto auto auto">
-      <button style="grid-column:1/2" class=" h-24 bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" onClick="btnClickKey('Escape')">
-        Escape
-      </button>
-      <button style="grid-column:2/3" class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" 
-      onmousedown="starttimer(event,'Up', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'Up', btnClickKey)" ontouchend="stoptimer()"  
+	def get_static_file_list(self, path):
+		files = []
+		relative_path = path.replace(self.base_static_file_path, "").strip()
+		if Path(path).is_dir() and path != self.base_static_file_path:
+			dir_list = relative_path.split("/")
+			print(f"dir_list {dir_list}")
+			files.append("/"+"/".join(dir_list[:-1]))
+		files = files + [os.path.join(relative_path, cur_path) for cur_path in os.listdir(path)]
+		return [f"<li><a href='/fileserve/{file}'>{file}</a></li>" for file in files ]
 
-      >
-        up
-      </button>
-      <button style="grid-column:3/4" class=" h-24 bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" onClick="btnClickKey('KP_Space')">
-        Space
-      </button>
-      <button style="grid-column:1/2"  class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" 
-      onmousedown="starttimer(event,'Left', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'Left', btnClickKey)" ontouchend="stoptimer()"  
+	def do_GET(self):
+		print("Request url {}".format(self.path))
+		
+		if "/fileserve" in self.path:
+			path = self.path
+			file_path = urllib.parse.unquote(path.replace("/fileserve","").strip()).split("/")
+			list_path = self.base_static_file_path
+			if file_path :
+				abs_file_path = os.path.join(self.base_static_file_path, *file_path)
+				if Path(abs_file_path).is_dir() :
+					list_path = os.path.join(self.base_static_file_path, *file_path)
+				elif Path(abs_file_path).is_file() :
+					self.send_response(200)
+					self.send_header("Content-type", "application/octet")
+					self.end_headers()
+					with open(abs_file_path, 'rb') as infile:
+						d = infile.read(1024)
+						while d:
+							self.wfile.write(d)
+							d = infile.read(1024)
+					return
+			print(f"file_path {file_path} base_static_file_path {self.base_static_file_path} list_path {list_path}")
+			
+			file_list_response = "<html><ul>"+''.join(self.get_static_file_list(list_path))+"</ul></html>" 
+			self._set_headers()
+			self.wfile.write(self._html(file_list_response))
+			
+			self.send_response(200)
+			return
 
-      >
-        left
-      </button>
-       
-      <button style="grid-column:2/3"  class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" onClick="btnClickKey('Return')">
-        enter
-      </button>
-      <button  style="grid-column:3/4"  class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" 
-      onmousedown="starttimer(event,'Right', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'Right', btnClickKey)" ontouchend="stoptimer()"  
-            >
-        right
-      </button>
-      <button style="grid-column:2/3"  class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg" type="button" 
-      onmousedown="starttimer(event,'Down', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'Down', btnClickKey)" ontouchend="stoptimer()"  
-
-      >
-        down
-      </button>
-    </div>
-  </form>
-  <a href="/fileserve" target="_blank">Static files</a>
-  <form target="_blank" enctype = "multipart/form-data" action = "/fileupload" method = "post">
-    <p>Upload File: <input type = "file" name = "file" /></p>
-    <p><input type = "submit" value = "Upload" /></p>
-  </form>
-
-  
+		if "assets/" in self.path:
+			self.send_response(200)
+			self.send_header("Content-type", mimetypes.guess_type(self.path[1:])[0])
+			self.end_headers()
+			self.write_binary_content("./"+self.path[1:])
+			return
+		if "/favicon.ico" in self.path:
+			self.send_response(200)
+			self.send_header("Content-type", mimetypes.guess_type("assets/favicon.ico")[0])
+			self.end_headers()
+			self.write_binary_content("./"+"assets/favicon.ico")
+			return
+		if "/remote_icon.png" in self.path:
+			self.send_response(200)
+			self.send_header("Content-type", mimetypes.guess_type("assets/remote_icon.png")[0])
+			self.end_headers()
+			self.write_binary_content("./"+"assets/remote_icon.png")
+			return
 
 
-  <script>
-    let timerId;
-    let afterNumberOfTimers = 10;
-    let counter=0;
-    function starttimer(e,cmd, fn=btnClickMouse){
-      if(e){
-        e.preventDefault()
-      }
-      
-      if(counter == 0){
-        console.log("run cmd",cmd)
-        fn(cmd)
-      }
-      counter++; 
-      if(counter == afterNumberOfTimers){
-        counter = 0;
-      }
-      
-      timerId = requestAnimationFrame(()=>{starttimer(null,cmd, fn)})
-    }
-    function stoptimer(){
-      cancelAnimationFrame(timerId)
-    }
-  </script>
+		self._set_headers()
+		key =""
+		cmd =""
+		if "?" in self.path:
+			queryParams = self.transformQueryParam()
+			key = queryParams["key"] if "key" in queryParams.keys() else key 
+			cmd = queryParams["cmd"] if "cmd" in queryParams.keys() else cmd 
+			reqTimestamp =  int(queryParams["timestamp"])
+			currTimestamp =  datetime.datetime.now().replace(tzinfo = datetime.timezone.utc).timestamp()
+			print("timestamp diff ")
+			print((int(currTimestamp) - int(reqTimestamp/1000)))
+			with open('run_commands.csv', 'a',  encoding='utf8') as writer:
+				writeLine = f"{cmd} {key},{reqTimestamp}\n"
+				writer.write(writeLine)
+			if int(currTimestamp) - int(reqTimestamp/1000) < 3 :
+				# print("xdotool "+cmd +" "+ key)
+				subprocess.call("xdotool "+cmd +" "+ key, shell=True, timeout=0.1)
 
-    <script>
-      var form = document.getElementById("form");
 
-      function populateTimestamp() {
-        if(window.websoc){
-          window.websoc.send(`${form.cmd.value} ${form.key.value}`)
-          return false;
-        }
-        form.timestamp.value =
-          new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000;
-        console.log("form.timestamp.value", form.timestamp.value);
-        return true;
-      }
 
-      function btnClickKey(value) {
-        if(window.websoc){
-          window.websoc.send(`key ${value}`)
-          return; 
-        }
-        form.cmd.value = "key";
-        form.key.value = value;
-        
-        populateTimestamp();
-        form.submit();
-      }
+			
+		#self.wfile.write(self.getHtmlContent()%{"cmd":cmd, "key":key})
+		formatted_string = self.getHtmlContent().replace("%(cmd)s", cmd).replace("%(key)s", key)
+		self.wfile.write(self._html(formatted_string))
+		
 
-      function btnClickMouse(value) {
-        if(window.websoc){
-          console.log("value",value)
-          window.websoc.send(`mousemove_relative --sync ${value}`)
-          return;
-        }
+	def do_HEAD(self):
+		self._set_headers()
 
-        form.cmd.value = "mousemove_relative --sync ";
-        form.key.value = value;
-        
-        populateTimestamp();
-        form.submit();
-      }
 
-      function btnClickSetCmd(cmd) {
-        form.cmd.value = cmd;
-        form.key.value = "";
-        form.key.focus();
-      }
-    </script>
-    <style>
-      button {
-        min-height: 70px;
-        min-width: 100px;
-        margin: 10px;
-      }
-    </style>
+	def do_POST(self):
+		if self.path == '/fileupload':
+			form = cgi.FieldStorage(
+                fp=self.rfile,
+                headers=self.headers,
+                environ={'REQUEST_METHOD':'POST',
+                         'CONTENT_TYPE':self.headers['Content-Type'],
+                         })
+			filename = form['file'].filename
+			with open(os.path.join(self.upload_file_path,filename), 'wb') as fh:
+				print("copyting "+ filename+" ->"+str(fh))
+				shutil.copyfileobj(form['file'].file, fh)
+		self.send_response(301)
+		self.send_header('Location','/fileserve/uploads')
+		self.end_headers()
 
-    <script>
-      function createFromData(cmd, key) {
-        populateTimestamp();
-        form.cmd.value = cmd;
-        form.key.value = key;
-        document.getElementById("last-command").innerHTML= `${cmd? cmd:""} ${key? key:""}`;
-        var formData = new FormData(form);
-        //formData.append("cmd", cmd);
-        //formData.append("key", key);
-        return formData;
-      }
+	def transformQueryParam(self):
+		print(self.path)
+		queryString = self.path.split("?")[1]
+		queryParams = {item[0]: item[1] for item in urllib.parse.parse_qsl(queryString)}
+		print(queryParams)
+		return queryParams
+		
+	def getHtmlContent(self, filename= "xdo_input.html"):
+		# fName = "xdo_input.html"
+		if os.path.exists(filename):
+			with open(filename, 'r') as f:
+				try:
+				   html = f.read()
+				   #print(html)
+				   return html
+				except IOError as e:
+					print("IO Error")
+			   
+			    
+				   
+def run(server_class=HTTPServer, handler_class=S, addr="0.0.0.0", port=4443):
+	server_address = (addr, port)
+	httpd = HTTPServer(server_address, handler_class)
+	httpd.socket = ssl.wrap_socket(httpd.socket, server_side=True, certfile='./certificate.crt', keyfile="./privatekey.key", ssl_version=ssl.PROTOCOL_TLS)
+	print(f"Starting httpd server on {addr}:{port}")
+	httpd.serve_forever()
 
-      function sendFormData(formData) {
-        const data = [...formData.entries()];
-        const asString = data
-          .map(
-            (x) => `${encodeURIComponent(x[0])}=${encodeURIComponent(x[1])}`
-          )
-          .join("&");
-        console.log(asString);
-        fetch("/?" + asString, {
-          method: "GET",
-        });
-      }
 
-      var trackPadElement = document.getElementsByTagName("track-pad")[0];
-      trackPadElement.deltaCallBack = (delta) => {
-        console.log("delta", delta);
-        var xValue = delta.x < 0 ? "-- " + delta.x : delta.x;
-        xValue = delta.x;
-        if(window.websoc){
-          window.websoc.send(`mousemove_relative --sync ${xValue} ${delta.y}`)
-          return;
-        }
-        sendFormData(
-          createFromData("mousemove_relative --sync ", `${xValue} ${delta.y}`)
-        );
-      };
-      trackPadElement.leftClickCallBack = (touchPoint) => {
-        console.log("left click - touchPoint", touchPoint);
-        if(window.websoc){
-          window.websoc.send(`mousemove_relative --sync 0 0 click 1`)
-          return;
-        }
-        sendFormData(
-          createFromData("mousemove_relative --sync ", ` 0 0 click 1`)
-        );
-      };
 
-      trackPadElement.rightClickCallBack = (touchPoint) => {
-        console.log("right click - touchPoint", touchPoint);
-        if(window.websoc){
-          window.websoc.send(`mousemove_relative --sync 0 0 click 3`)
-          return;
-        }
-        sendFormData(
-          createFromData("mousemove_relative --sync ", ` 0 0 click 3`)
-        );
-      };
-      class Trackpad extends HTMLElement {
-        constructor() {
-          super();
-        }
 
-        connectedCallback() {
-          this.render();
-        }
+if __name__ == "__main__":
+	p = mp.Process(target=run, args=())
+	p.start()
+	asyncio.get_event_loop().run_until_complete(wsmain())
 
-        render() {
-          const div = document.createElement("div");
-          div.style.width = "100%";
-          div.style.height = "500px";
-          div.style.backgroundColor = "beige";
-          div.ontouchmove = this.handleTouchMove;
-          div.ontouchstart = this.handleTouchStart;
-          div.ontouchend = this.handleTouchEnd;
-          this.appendChild(div);
 
-          //this.innerHTML = `<h1>Hello, World!</h1>`;
-        }
-        start = {
-          x: 0,
-          y: 0,
-        };
-        move = {
-          x: 0,
-          y: 0,
-        };
-        handleTouchStart = (event) => {
-          event.preventDefault();
-          this.start.x = event.touches[0].pageX;
-          this.start.y = event.touches[0].pageY;
-          this.move = {
-            x: 0,
-            y: 0,
-          };
-        };
 
-        handleTouchEnd = (event) => {
-          event.preventDefault();
-          this.move = {
-            x: 0,
-            y: 0,
-          };
-          window.touch = "end";
-
-          if (event.touches.length > 0) {
-            this.rightClickCallBack(this.start);
-          } else if (
-            this.start.x == event.changedTouches[0].pageX &&
-            this.start.y == event.changedTouches[0].pageY
-          ) {
-            this.leftClickCallBack(this.move);
-          }
-        };
-
-        handleTouchMove = (event) => {
-          event.preventDefault();
-          window.touch = "move";
-          var firstTouch = event.changedTouches[0];
-          var endX = firstTouch.pageX;
-          var endY = firstTouch.pageY;
-          var lastMove = this.move;
-          var max = Math.max(
-            Math.abs(endX - lastMove.x),
-            Math.abs(endY - lastMove.y)
-          );
-
-          if (max > 1 && (lastMove.x != 0 || lastMove.y !== 0)) {
-            this.deltaCallBack({
-              x: endX - lastMove.x,
-              y: endY - lastMove.y,
-            });
-          }
-          this.move = {
-            x: endX,
-            y: endY,
-          };
-        };
-      }
-
-      customElements.define("track-pad", Trackpad);
-    </script>
-
-    <script>
-      function sendClipboardData() {
-        try {
-          navigator.clipboard.readText().then(function (data) {
-            console.log("Copied String ", data);
-            sendFormData(createFromData(data, ""));
-          }).catch((e) => {
-            alert(e.message)
-          });
-
-        } catch (e) {
-          alert(e.message)
-        }
-      }
-
-    </script>
-
-    <script>
-      let alertDiv = document.getElementById("alert");
-      function connectToWebSocket(){
-        // alertDiv.style.display = "block"
-        if(window.websoc) return;
-      let socket = new WebSocket(`wss://${location.hostname}:8765`);
-
-        socket.onopen = function(e) {
-          console.log("Web socket connected");
-          //  alert("web socket connected");
-          alertDiv.style.display = "none"
-          window.websoc=socket;
-        };
-        socket.onmessage = function(event) {
-          console.log(`[message] Data received from server: ${event.data}`);
-        };
-
-        socket.onclose = function(event) {
-          window.websoc= null;
-          if (event.wasClean) {
-            alertDiv.style.display = "block"
-            // alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-          } else {
-            // e.g. server process killed or network down
-            // event.code is usually 1006 in this case
-            // alert('[close] Connection died');
-            alertDiv.style.display = "block"
-          }
-        };
-
-        socket.onerror = function(error) {
-          alertDiv.style.display = "block"
-          // alert(`[error] ${error.message}`);
-        };
-      }
-      connectToWebSocket();
-      window.addEventListener("visibilitychange", function(event) {
-        connectToWebSocket();
-        }, false);
-    </script>
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", function() {
-          navigator.serviceWorker
-            .register("/assets/serviceWorker.js")
-            .then(res => console.log("service worker registered"))
-            .catch(err => console.log("service worker not registered", err))
-        })
-      }
-    </script>
-  
-</body>
-
-</html>
