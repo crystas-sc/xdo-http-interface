@@ -50,7 +50,7 @@
   <form id="form" method="get" onsubmit="return populateTimestamp()">
     <p class="form-label inline-block mb-2 text-gray-700 text-xl">Last command: <span id="last-command">%(cmd)s
         %(key)s</span></p>
-    <div class="top-items">
+    <div class="top-items p-2">
       <input type="text" name="cmd" value="%(cmd)s" class="form-control
       block
       w-full
@@ -83,47 +83,29 @@
       m-0
       focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" />
       <input type="hidden" name="timestamp" value="" />
-      <button type="submit"
-        class="inline-block px-6 py-2.5 bg-indigo-500  text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">submit</button>
+      <div class="flex justify-between w-full">
+        <div>
+
+          <button type="submit"
+            class="inline-block px-6 py-2.5 bg-indigo-500  text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">submit</button>
 
 
-      <button type="button"
-        class="inline-block px-6 py-2.5 bg-indigo-500  text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-        onclick="sendClipboardData()">Send clipboard data</button>
+          <button type="button"
+            class="inline-block px-6 py-2.5 bg-indigo-500  text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+            onclick="sendClipboardData()">Send clipboard data</button>
 
+        </div>
+
+        <div class="flex items-center self-center">
+          <label class="inline-block">Key relay</label>
+          <input class="form-control border border-solid border-gray-300 text-xl" type="text"
+            onkeyup="keyPressRelay(event)" placeholder="keys will be silently sent" />
+        </div>
+
+
+      </div>
     </div>
-    <div>
-     <label>Key relay</label> <input type="text" onkeyup="keyPressRelay(event)" />
-      <script>
-        function toHex(d) {
-          return "0x" + ("0" + (Number(d).toString(16))).slice(-2).toUpperCase()
-        }
-        var specialChars = ["₹",":",";","?", "~", "&", `"`, `'`, "!", "@", "#", "$", "%", "^", "*", "(", ")", "-", "+", "=", ",", ".", "/", "\\", "<", ">"]
-        function keyPressRelay(e) {
-          e.preventDefault();
-          var key = e.key
-          if (e.keyCode === 229) {
-            key = e.target.value || "BackSpace"
-            key = key === " " ? "space" : key
-            if (specialChars.includes(key)) {
-              key = toHex(key.codePointAt(0))
-            }
-          } else if (e.keyCode === 8) {
-            key = "BackSpace"
-          } else if (e.keyCode === 13) {
-            key = "Return"
-          }
 
-          // alert(`key:${e.key} , which: ${e.which}, keyCode: ${e.keyCode} , code: ${e.code}, value: "${e.target.value}" , ckey: ${key}`)
-          key = key === "Backspace" ? "BackSpace" : key
-          key = key === " " ? "space" : key
-          // console.log("keyPressRelay",e.code,e.key, key)
-
-          btnClickKey(key)
-          e.target.value = ""
-        }
-      </script>
-    </div>
 
 
     <br />
@@ -142,8 +124,8 @@
         onClick="btnClickKey('alt+F4')">alt+F4</button>
       <button type="button"
         class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"
-        onClick="btnClickMouse(' 0 0 click 1')">
-        Left Click
+        onClick="mouseHoldFor3Sec()">
+        Left Click Down for 3 sec
       </button>
       <button type="button"
         class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"
@@ -314,7 +296,35 @@
   </form>
 
 
+  <script>
+    function toHex(d) {
+      return "0x" + ("0" + (Number(d).toString(16))).slice(-2).toUpperCase()
+    }
+    var specialChars = ["{","}","[","]","|","_","₹", ":", ";", "?", "~", "&", `"`, `'`, "!", "@", "#", "$", "%", "^", "*", "(", ")", "-", "+", "=", ",", ".", "/", "\\", "<", ">"]
+    function keyPressRelay(e) {
+      e.preventDefault();
+      var key = e.key
+      if (e.keyCode === 229) {
+        key = e.target.value || "BackSpace"
+        key = key === " " ? "space" : key
+        if (specialChars.includes(key)) {
+          key = toHex(key.codePointAt(0))
+        }
+      } else if (e.keyCode === 8) {
+        key = "BackSpace"
+      } else if (e.keyCode === 13) {
+        key = "Return"
+      }
 
+      // alert(`key:${e.key} , which: ${e.which}, keyCode: ${e.keyCode} , code: ${e.code}, value: "${e.target.value}" , ckey: ${key}`)
+      key = key === "Backspace" ? "BackSpace" : key
+      key = key === " " ? "space" : key
+      // console.log("keyPressRelay",e.code,e.key, key)
+
+      btnClickKey(key)
+      e.target.value = ""
+    }
+  </script>
 
   <script>
     let timerId;
@@ -355,6 +365,12 @@
       return true;
     }
 
+    function mouseHoldFor3Sec(value){
+      btnClickKey(" mousedown 1")
+      setTimeout(function(){
+        btnClickKey(" mouseup 1")
+      },3000)
+    }
     function btnClickKey(value) {
       if (window.websoc) {
         window.websoc.send(`key ${value}`)

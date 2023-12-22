@@ -16,7 +16,7 @@ ssl_context.load_cert_chain(ssl_cert, keyfile=ssl_key)
 async def echo(websocket):
     async for message in websocket:
         print(message)
-        if "mousemove_relative" in message and "click" not in message :
+        if "mousemove_relative" in message and "click" not in message and "mousedown" not in message :
             # if "click" in message :
             #     clk = message.split("click ")[1]
             #     print(f"clk {clk}")
@@ -33,12 +33,12 @@ async def echo(websocket):
 
 		
             mv = message.split("sync ")[1].split(" ")
-            print(f"mv {mv}")
+            # print(f"mv {mv}")
             mouse.move(int(float(mv[0])),int(float(mv[1])),absolute=False)
             continue
 			
         try:
-            print("subprocess")
+            # print("subprocess")
             if(message.startswith("type ")):
                 # with open('string_file.txt', "w") as myfile:
                 #     myfile.write(" ".join(message.split(" ")[1:]))
