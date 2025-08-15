@@ -362,8 +362,8 @@
       favourites.forEach((cmd, idx) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'flex items-center gap-2 mb-2';
-        const btn = document.createElement('button');
-  btn.className = 'btn px-6 py-4 text-lg flex items-center gap-3';
+  const btn = document.createElement('button');
+  btn.className = 'btn py-6 px-8 text-2xl flex items-center gap-4';
         btn.innerHTML = `<i class='fa fa-bolt'></i> ${cmd}`;
         btn.onclick = function() {
           const parts = cmd.split(' ');
