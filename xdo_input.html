@@ -10,31 +10,37 @@
     crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     :root {
-      --bg-main: #f8fafc;
-      --bg-secondary: #fff;
-      --text-main: #222;
-      --input-bg: #fff;
-      --input-text: #222;
-      --button-bg: #6366f1;
-      --button-hover: #4338ca;
-      --button-text: #fff;
-      --card-bg: #f1f5f9;
+  --bg-main: #f4f6fb;
+  --bg-secondary: #ffffff;
+  --text-main: #22223b;
+  --input-bg: #f7f7fa;
+  --input-text: #22223b;
+  --button-bg: #2563eb;
+  --button-hover: #1e40af;
+  --button-text: #fff;
+  --card-bg: #e9ecef;
+  --border-radius: 0.75rem;
+  --shadow: 0 2px 8px rgba(44,62,80,0.08);
     }
     .dark-theme {
-      --bg-main: #18181b;
-      --bg-secondary: #23272f;
-      --text-main: #e5e7eb;
-      --input-bg: #23272f;
-      --input-text: #e5e7eb;
-      --button-bg: #6366f1;
-      --button-hover: #4338ca;
-      --button-text: #fff;
-      --card-bg: #23272f;
+  --bg-main: #181a20;
+  --bg-secondary: #23272f;
+  --text-main: #e5e7eb;
+  --input-bg: #23272f;
+  --input-text: #e5e7eb;
+  --button-bg: #2563eb;
+  --button-hover: #1e40af;
+  --button-text: #fff;
+  --card-bg: #23272f;
+  --border-radius: 0.75rem;
+  --shadow: 0 2px 8px rgba(44,62,80,0.18);
     }
     body {
-      background: var(--bg-main);
-      color: var(--text-main);
-      transition: background 0.3s, color 0.3s;
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  transition: background 0.3s, color 0.3s;
+  min-height: 100vh;
     }
     input, textarea, select {
       background: var(--input-bg) !important;
@@ -45,19 +51,26 @@
       color: var(--input-text) !important;
     }
     .card, .op-buttons, .top-items {
-      background: var(--card-bg);
-      border-radius: 1rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      padding: 1rem;
-      margin-bottom: 1rem;
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+  margin-bottom: 1rem;
     }
     button, .btn {
-      background: var(--button-bg);
-      color: var(--button-text);
-      transition: background 0.2s;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
     }
     button:hover, .btn:hover {
-      background: var(--button-hover);
+  background: var(--button-hover);
+  box-shadow: 0 6px 18px rgba(44,62,80,0.16);
+  transform: translateY(-2px) scale(1.04);
     }
     .theme-toggle {
       background: var(--card-bg);
@@ -107,7 +120,7 @@
   </style>
 </head>
 
-<body>
+<body class="dark-theme">
   <!-- ...existing code... -->
   <div
     class="hidden bg-red-600 shadow-lg mx-auto w-96 max-w-full text-sm pointer-events-auto bg-clip-padding rounded-lg block mb-3"
@@ -182,73 +195,33 @@
     <div class="op-buttons flex justify-around ">
 
 
-      <button type="button"
-        class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"
-        onClick="btnClickKey('alt+Tab')">alt+Tab</button>
-      <button type="button"
-        class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"
-        onClick="btnClickKey('ctrl+F4')">ctrl+F4</button>
 
-      <button type="button"
-        class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"
-        onClick="btnClickKey('alt+F4')">alt+F4</button>
-      <button type="button"
-        class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"
-        onClick="mouseHoldFor3Sec()">
-        Left Click Down for 3 sec
+  <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-6 px-4 w-48 h-20 rounded shadow-xl active:shadow-lg" onClick="btnClickKey('alt+Tab')">
+        <i class="fa fa-window-restore mr-2"></i> alt+Tab
       </button>
-      <button type="button"
-        class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"
-        onClick="btnClickMouse(' 0 0 click 3')">
-        Right Click
+  <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-6 px-4 w-48 h-20 rounded shadow-xl active:shadow-lg" onClick="btnClickKey('ctrl+F4')">
+        <i class="fa fa-times-circle mr-2"></i> ctrl+F4
       </button>
-      <!--
-      <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"  onmousedown="starttimer(event,' 0 0 click 4')" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,' 0 0 click 4')" ontouchend="stoptimer()" onClick1="btnClickMouse(' 0 0 click 4')">
-        Scroll up
+  <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-6 px-4 w-48 h-20 rounded shadow-xl active:shadow-lg" onClick="btnClickKey('alt+F4')">
+        <i class="fa fa-power-off mr-2"></i> alt+F4
       </button>
-      <button type="button"  class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"  onmousedown="starttimer(event,' 0 0 click 5')" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,' 0 0 click 5')" ontouchend="stoptimer()" onClick1="btnClickMouse(' 0 0 click 5')">
-        Scroll down
+  <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-6 px-4 w-48 h-20 rounded shadow-xl active:shadow-lg" onClick="mouseHoldFor3Sec()">
+        <i class="fa fa-mouse-pointer mr-2"></i> Left Click Down for 3 sec
       </button>
-      
-      <button type="button"  class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"  onClick="btnClickSetCmd('mousemove_relative --sync ')">
-        Mouse Move
+  <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-6 px-4 w-48 h-20 rounded shadow-xl active:shadow-lg" onClick="btnClickMouse(' 0 0 click 3')">
+        <i class="fa fa-mouse mr-2"></i> Right Click
       </button>
-      -->
-      <button type="button"
-        class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"
-        onClick="btnClickSetCmd('key')">key cmd</button>
-      <button type="button"
-        class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"
-        onClick="btnClickSetCmd('type')">type cmd</button>
-
-
-      <button type="button"
-        class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"
-        onClick="btnClickKey('--clearmodifiers XF86AudioMute')">
-        Mute
+  <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-6 px-4 w-48 h-20 rounded shadow-xl active:shadow-lg" onClick="btnClickSetCmd('key')">
+        <i class="fa fa-keyboard mr-2"></i> key cmd
       </button>
-      <!-- <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioPlay')">
-        Play
+  <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-6 px-4 w-48 h-20 rounded shadow-xl active:shadow-lg" onClick="btnClickSetCmd('type')">
+        <i class="fa fa-i-cursor mr-2"></i> type cmd
       </button>
-      <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioStop')">
-        Stop
+  <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-6 px-4 w-48 h-20 rounded shadow-xl active:shadow-lg" onClick="btnClickKey('--clearmodifiers XF86AudioMute')">
+        <i class="fa fa-volume-mute mr-2"></i> Mute
       </button>
-      <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioPrev')">
-        Prev
-      </button>
-      <button type="button" onClick="btnClickKey('--clearmodifiers XF86AudioNext')">
-        Next
-      </button>
-      <button type="button" onmousedown="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" ontouchend="stoptimer()" onClick1="btnClickKey('--clearmodifiers XF86AudioRaiseVolume')">
-        Vol+
-      </button>
-      <button type="button" onmousedown="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" onmouseleave="stoptimer()" onmouseup="stoptimer()"  ontouchstart="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" ontouchend="stoptimer()" onClick1="btnClickKey('--clearmodifiers XF86AudioLowerVolume')">
-        Vol-
-      </button> -->
-      <button
-        class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded shadow-xl active:shadow-lg"
-        type="button" onClick="btnClickKey('Return')">
-        enter
+  <button type="button" class="bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-6 px-4 w-48 h-20 rounded shadow-xl active:shadow-lg" onClick="btnClickKey('Return')">
+        <i class="fa fa-sign-in-alt mr-2"></i> enter
       </button>
 
 
@@ -287,14 +260,14 @@
       <button class="bg-teal-800 focus:outline-none text-white text-3xl p-3 px-8 shadow-xl active:shadow-lg"
         onmousedown="starttimer(event,' 0 0 click 4')" onmouseleave="stoptimer()" onmouseup="stoptimer()"
         ontouchstart="starttimer(event,' 0 0 click 4')" ontouchend="stoptimer()">
-        Scroll <i class="fa fa-arrow-up-long fa-1x text-white"></i>
+        <i class="fa fa-arrow-up-long fa-1x text-white mr-2"></i> Scroll
       </button>
       <button
         class="bg-blue-800 focus:outline-none text-white text-3xl p-3 px-8 w-1/6 rounded-full shadow-xl active:shadow-lg"
         onmousedown="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)" onmouseleave="stoptimer()"
         onmouseup="stoptimer()" ontouchstart="starttimer(event,'--clearmodifiers XF86AudioRaiseVolume', btnClickKey)"
         ontouchend="stoptimer()">
-        <i class="fa fa-volume-high fa-1x text-white"></i>
+        <i class="fa fa-volume-up fa-1x text-white mr-2"></i> Vol+
       </button>
     </div>
     <div class="flex justify-around ">
@@ -302,15 +275,15 @@
 
       <button class="bg-teal-800 focus:outline-none text-white text-3xl p-3 px-8 shadow-xl active:shadow-lg"
         onmousedown="starttimer(event,' 0 0 click 5')" onmouseleave="stoptimer()" onmouseup="stoptimer()"
-        ontouchstart="starttimer(event,' 0 0 click 5')" ontouchend="stoptimer()">Scroll
-        <i class="fa fa-arrow-down-long fa-1x text-white"></i>
+        ontouchstart="starttimer(event,' 0 0 click 5')" ontouchend="stoptimer()">
+        <i class="fa fa-arrow-down-long fa-1x text-white mr-2"></i> Scroll
       </button>
       <button
         class="bg-blue-800 focus:outline-none text-white text-3xl p-3 px-8 w-1/6 rounded-full shadow-xl active:shadow-lg"
         onmousedown="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)" onmouseleave="stoptimer()"
         onmouseup="stoptimer()" ontouchstart="starttimer(event,'--clearmodifiers XF86AudioLowerVolume', btnClickKey)"
         ontouchend="stoptimer()">
-        <i class="fa fa-volume-low fa-1x text-white"></i>
+        <i class="fa fa-volume-down fa-1x text-white mr-2"></i> Vol-
       </button>
     </div>
 
@@ -320,42 +293,42 @@
       <button style="grid-column:1/2"
         class=" h-24 bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg"
         type="button" onClick="btnClickKey('Escape')">
-        Escape
+        <i class="fa fa-sign-out-alt mr-2"></i> Escape
       </button>
       <button style="grid-column:2/3"
         class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg"
         type="button" onmousedown="starttimer(event,'Up', btnClickKey)" onmouseleave="stoptimer()"
         onmouseup="stoptimer()" ontouchstart="starttimer(event,'Up', btnClickKey)" ontouchend="stoptimer()">
-        up
+        <i class="fa fa-arrow-up mr-2"></i> up
       </button>
       <button style="grid-column:3/4"
         class=" h-24 bg-yellow-800 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg"
         type="button" onClick="btnClickKey('KP_Space')">
-        Space
+        <i class="fa fa-space-shuttle mr-2"></i> Space
       </button>
       <button style="grid-column:1/2"
         class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg"
         type="button" onmousedown="starttimer(event,'Left', btnClickKey)" onmouseleave="stoptimer()"
         onmouseup="stoptimer()" ontouchstart="starttimer(event,'Left', btnClickKey)" ontouchend="stoptimer()">
-        left
+        <i class="fa fa-arrow-left mr-2"></i> left
       </button>
 
       <button style="grid-column:2/3"
         class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg"
         type="button" onClick="btnClickKey('Return')">
-        enter
+        <i class="fa fa-sign-in-alt mr-2"></i> enter
       </button>
       <button style="grid-column:3/4"
         class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg"
         type="button" onmousedown="starttimer(event,'Right', btnClickKey)" onmouseleave="stoptimer()"
         onmouseup="stoptimer()" ontouchstart="starttimer(event,'Right', btnClickKey)" ontouchend="stoptimer()">
-        right
+        <i class="fa fa-arrow-right mr-2"></i> right
       </button>
       <button style="grid-column:2/3"
         class="h-24 bg-blue-800 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded shadow-xl active:shadow-lg"
         type="button" onmousedown="starttimer(event,'Down', btnClickKey)" onmouseleave="stoptimer()"
         onmouseup="stoptimer()" ontouchstart="starttimer(event,'Down', btnClickKey)" ontouchend="stoptimer()">
-        down
+        <i class="fa fa-arrow-down mr-2"></i> down
       </button>
     </div>
   </form>
