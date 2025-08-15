@@ -175,14 +175,22 @@ class S(BaseHTTPRequestHandler):
 def run(server_class=HTTPServer, handler_class=S, addr="0.0.0.0", port=4443):
 	server_address = (addr, port)
 	httpd = HTTPServer(server_address, handler_class)
-	httpd.socket = ssl.wrap_socket(httpd.socket, server_side=True, certfile='./certificate.crt', keyfile="./privatekey.key", ssl_version=ssl.PROTOCOL_TLS)
-	print(f"Starting httpd server on {addr}:{port}")
+	if getattr(run, "plain_http", False):
+		print(f"Starting plain HTTP server on {addr}:{port}")
+	else:
+		context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+		context.load_cert_chain(certfile='./certificate.crt', keyfile='./privatekey.key')
+		httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
+		print(f"Starting HTTPS server on {addr}:{port}")
 	httpd.serve_forever()
 
 
 
 
 if __name__ == "__main__":
+	import sys
+	plain_http = "--plain-http" in sys.argv
+	setattr(run, "plain_http", plain_http)
 	p = mp.Process(target=run, args=())
 	p.start()
 	asyncio.get_event_loop().run_until_complete(wsmain())

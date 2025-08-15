@@ -9,6 +9,70 @@
     integrity="sha512-10/jx2EXwxxWqCLX/hHth/vu2KY3jCF70dCQB8TSgNjbCVAC/8vai53GfMDrO2Emgwccf2pJqxct9ehpzG+MTw=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
+    :root {
+      --bg-main: #f8fafc;
+      --bg-secondary: #fff;
+      --text-main: #222;
+      --input-bg: #fff;
+      --input-text: #222;
+      --button-bg: #6366f1;
+      --button-hover: #4338ca;
+      --button-text: #fff;
+      --card-bg: #f1f5f9;
+    }
+    .dark-theme {
+      --bg-main: #18181b;
+      --bg-secondary: #23272f;
+      --text-main: #e5e7eb;
+      --input-bg: #23272f;
+      --input-text: #e5e7eb;
+      --button-bg: #6366f1;
+      --button-hover: #4338ca;
+      --button-text: #fff;
+      --card-bg: #23272f;
+    }
+    body {
+      background: var(--bg-main);
+      color: var(--text-main);
+      transition: background 0.3s, color 0.3s;
+    }
+    input, textarea, select {
+      background: var(--input-bg) !important;
+      color: var(--input-text) !important;
+      border-color: #444 !important;
+    }
+    .form-label, .form-control, .top-items input {
+      color: var(--input-text) !important;
+    }
+    .card, .op-buttons, .top-items {
+      background: var(--card-bg);
+      border-radius: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    button, .btn {
+      background: var(--button-bg);
+      color: var(--button-text);
+      transition: background 0.2s;
+    }
+    button:hover, .btn:hover {
+      background: var(--button-hover);
+    }
+    .theme-toggle {
+      background: var(--card-bg);
+      color: var(--text-main);
+      border: none;
+      border-radius: 2rem;
+      padding: 0.5rem 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      cursor: pointer;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+  </style>
+  <style>
     .op-buttons,
     .top-items {
       display: flex;
@@ -44,6 +108,7 @@
 </head>
 
 <body>
+  <!-- ...existing code... -->
   <div
     class="hidden bg-red-600 shadow-lg mx-auto w-96 max-w-full text-sm pointer-events-auto bg-clip-padding rounded-lg block mb-3"
     id="alert" role="alert" aria-live="assertive" aria-atomic="true" data-mdb-autohide="false">
@@ -104,7 +169,7 @@
         <div class="flex items-center self-center">
           <label class="inline-block">Key relay</label>
           <input class="form-control border border-solid border-gray-300 text-xl" type="text"
-            onkeyup="keyPressRelay(event)" placeholder="keys will be silently sent" />
+            onkeyup="keyPressRelay(event)" placeholder="keys will be silently sent" autocapitalize="off" />
         </div>
 
 
@@ -294,14 +359,30 @@
       </button>
     </div>
   </form>
-  <a href="/fileserve" target="_blank">Static files</a>
-  <form target="_blank" enctype="multipart/form-data" action="/fileupload" method="post">
-    <p>Upload File: <input type="file" name="file" /></p>
-    <p><input type="submit" value="Upload" /></p>
-  </form>
+
 
 
   <script>
+    function toggleTheme() {
+      const body = document.body;
+      const label = document.getElementById('theme-label');
+      if (body.classList.contains('dark-theme')) {
+        body.classList.remove('dark-theme');
+        label.textContent = 'Dark';
+        localStorage.setItem('theme', 'light');
+      } else {
+        body.classList.add('dark-theme');
+        label.textContent = 'Light';
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+    // On load, set theme from localStorage
+    window.onload = function() {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-theme');
+        document.getElementById('theme-label').textContent = 'Light';
+      }
+    }
     function toHex(d) {
       return "0x" + ("0" + (Number(d).toString(16))).slice(-2).toUpperCase()
     }
@@ -628,6 +709,29 @@
     }
   </script>
 
+
+  <div class="w-full flex justify-center p-4 mt-8">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">
+      <i class="fa fa-moon"></i> <span id="theme-label">Dark</span> Mode
+    </button>
+  </div>
+  <section class="w-full flex flex-col items-center p-4 mt-2">
+    <div class="card w-full max-w-xl mb-4 text-center">
+      <h2 class="text-2xl font-bold mb-2">Static Files</h2>
+      <a href="/fileserve" target="_blank" class="text-indigo-500 underline">Browse Static Files</a>
+    </div>
+    <div class="card w-full max-w-xl text-center">
+      <h2 class="text-2xl font-bold mb-2">Upload File</h2>
+      <form target="_blank" enctype="multipart/form-data" action="/fileupload" method="post">
+        <label class="block mb-2 font-medium">Choose file to upload:</label>
+        <input type="file" name="file" class="form-control mb-4" />
+        <input type="submit" value="Upload" class="btn px-6 py-2.5" />
+      </form>
+    </div>
+  </section>
+
 </body>
+
+
 
 </html>

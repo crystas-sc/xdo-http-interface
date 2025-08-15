@@ -11,6 +11,7 @@ This project uses Python simple http server to provide an http interface to tran
 
 ## Deployment
 ```
+python -m pip install -r requirements.txt
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout privatekey.key -out certificate.crt
 python http_xdo.py
 ```
