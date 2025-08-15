@@ -135,10 +135,10 @@
     <p class="form-label inline-block mb-2 text-gray-700 text-xl">Last command: <span id="last-command">%(cmd)s %(key)s</span></p>
     <div class="card w-full max-w-xl mb-4 text-center" id="favourite-section">
       <h2 class="text-2xl font-bold mb-2">Favourite Commands</h2>
-      <div id="favourite-buttons" class="flex flex-wrap justify-center gap-2 mb-2"></div>
       <button type="button" class="btn px-4 py-2" onclick="addFavouriteCommand()">
         <i class="fa fa-star mr-2"></i>Add Last Command to Favourites
       </button>
+      <div id="favourite-buttons" class="flex flex-wrap justify-center gap-2 mb-2"></div>      
     </div>
     <div class="top-items p-2">
       <input type="text" name="cmd" value="%(cmd)s" class="form-control
@@ -351,8 +351,8 @@
       if (!favourites.includes(lastCmdText)) {
         favourites.push(lastCmdText);
         localStorage.setItem('favouriteCommands', JSON.stringify(favourites));
-        renderFavouriteButtons();
       }
+      renderFavouriteButtons();
     }
 
     function renderFavouriteButtons() {
@@ -372,7 +372,11 @@
           form.cmd.value = cmdVal;
           form.key.value = keyVal;
           populateTimestamp();
-          form.submit();
+          if (window.websoc) {
+            window.websoc.send(`${cmdVal} ${keyVal}`.trim());
+          } else {
+            form.submit();
+          }
         };
         const delBtn = document.createElement('button');
   delBtn.className = 'rounded-full px-3 py-2 bg-red-600 hover:bg-red-800 text-white shadow-md flex items-center justify-center';
@@ -473,13 +477,13 @@
       const lastCmd = `${form.cmd.value} ${form.key.value}`.trim();
       localStorage.setItem('lastCommand', lastCmd);
       document.getElementById('last-command').textContent = lastCmd;
+      form.timestamp.value =
+        new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000;
+      console.log("form.timestamp.value", form.timestamp.value);
       if (window.websoc) {
         window.websoc.send(lastCmd)
         return false;
       }
-      form.timestamp.value =
-        new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000;
-      console.log("form.timestamp.value", form.timestamp.value);
       return true;
     }
 
