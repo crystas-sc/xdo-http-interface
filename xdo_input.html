@@ -345,7 +345,7 @@
   <script>
     // Favourite commands logic
     function addFavouriteCommand() {
-      const lastCmdText = document.getElementById('last-command').textContent.trim();
+      const lastCmdText = localStorage.getItem('lastCommand') || document.getElementById('last-command').textContent.trim();
       if (!lastCmdText) return;
       let favourites = JSON.parse(localStorage.getItem('favouriteCommands') || '[]');
       if (!favourites.includes(lastCmdText)) {
@@ -360,6 +360,8 @@
       container.innerHTML = '';
       let favourites = JSON.parse(localStorage.getItem('favouriteCommands') || '[]');
       favourites.forEach((cmd, idx) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flex items-center gap-2 mb-2';
         const btn = document.createElement('button');
         btn.className = 'btn px-4 py-2 flex items-center gap-2';
         btn.innerHTML = `<i class='fa fa-bolt'></i> ${cmd}`;
@@ -372,7 +374,19 @@
           populateTimestamp();
           form.submit();
         };
-        container.appendChild(btn);
+        const delBtn = document.createElement('button');
+  delBtn.className = 'rounded-full px-3 py-2 bg-red-600 hover:bg-red-800 text-white shadow-md flex items-center justify-center';
+        delBtn.title = 'Delete Favourite';
+        delBtn.innerHTML = `<i class='fa fa-trash'></i>`;
+        delBtn.onclick = function(e) {
+          e.stopPropagation();
+          favourites.splice(idx, 1);
+          localStorage.setItem('favouriteCommands', JSON.stringify(favourites));
+          renderFavouriteButtons();
+        };
+        wrapper.appendChild(btn);
+        wrapper.appendChild(delBtn);
+        container.appendChild(wrapper);
       });
     }
 
@@ -456,8 +470,11 @@
     var form = document.getElementById("form");
 
     function populateTimestamp() {
+      const lastCmd = `${form.cmd.value} ${form.key.value}`.trim();
+      localStorage.setItem('lastCommand', lastCmd);
+      document.getElementById('last-command').textContent = lastCmd;
       if (window.websoc) {
-        window.websoc.send(`${form.cmd.value} ${form.key.value}`)
+        window.websoc.send(lastCmd)
         return false;
       }
       form.timestamp.value =
