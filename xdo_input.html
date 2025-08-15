@@ -132,8 +132,14 @@
     </div>
   </div>
   <form id="form" method="get" onsubmit="return populateTimestamp()">
-    <p class="form-label inline-block mb-2 text-gray-700 text-xl">Last command: <span id="last-command">%(cmd)s
-        %(key)s</span></p>
+    <p class="form-label inline-block mb-2 text-gray-700 text-xl">Last command: <span id="last-command">%(cmd)s %(key)s</span></p>
+    <div class="card w-full max-w-xl mb-4 text-center" id="favourite-section">
+      <h2 class="text-2xl font-bold mb-2">Favourite Commands</h2>
+      <div id="favourite-buttons" class="flex flex-wrap justify-center gap-2 mb-2"></div>
+      <button type="button" class="btn px-4 py-2" onclick="addFavouriteCommand()">
+        <i class="fa fa-star mr-2"></i>Add Last Command to Favourites
+      </button>
+    </div>
     <div class="top-items p-2">
       <input type="text" name="cmd" value="%(cmd)s" class="form-control
       block
@@ -337,6 +343,41 @@
 
 
   <script>
+    // Favourite commands logic
+    function addFavouriteCommand() {
+      const lastCmdText = document.getElementById('last-command').textContent.trim();
+      if (!lastCmdText) return;
+      let favourites = JSON.parse(localStorage.getItem('favouriteCommands') || '[]');
+      if (!favourites.includes(lastCmdText)) {
+        favourites.push(lastCmdText);
+        localStorage.setItem('favouriteCommands', JSON.stringify(favourites));
+        renderFavouriteButtons();
+      }
+    }
+
+    function renderFavouriteButtons() {
+      const container = document.getElementById('favourite-buttons');
+      container.innerHTML = '';
+      let favourites = JSON.parse(localStorage.getItem('favouriteCommands') || '[]');
+      favourites.forEach((cmd, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn px-4 py-2 flex items-center gap-2';
+        btn.innerHTML = `<i class='fa fa-bolt'></i> ${cmd}`;
+        btn.onclick = function() {
+          const parts = cmd.split(' ');
+          const cmdVal = parts[0] || '';
+          const keyVal = parts.slice(1).join(' ') || '';
+          form.cmd.value = cmdVal;
+          form.key.value = keyVal;
+          populateTimestamp();
+          form.submit();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    // Render on load
+    window.addEventListener('DOMContentLoaded', renderFavouriteButtons);
     function toggleTheme() {
       const body = document.body;
       const label = document.getElementById('theme-label');
