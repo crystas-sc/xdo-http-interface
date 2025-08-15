@@ -603,17 +603,56 @@
 
       render() {
         const div = document.createElement("div");
-  div.style.width = "100%";
-  div.style.height = "500px";
-  // Use CSS variable for trackpad background
-  div.style.backgroundColor = getComputedStyle(document.body).getPropertyValue('--trackpad-bg') || "beige";
-  div.ontouchmove = this.handleTouchMove;
-  div.ontouchstart = this.handleTouchStart;
-  div.ontouchend = this.handleTouchEnd;
-  this.appendChild(div);
+        div.style.width = "100%";
+        div.style.height = "500px";
+        // Use CSS variable for trackpad background
+        div.style.backgroundColor = getComputedStyle(document.body).getPropertyValue('--trackpad-bg') || "beige";
+        div.ontouchmove = this.handleTouchMove;
+        div.ontouchstart = this.handleTouchStart;
+        div.ontouchend = this.handleTouchEnd;
 
-        //this.innerHTML = `<h1>Hello, World!</h1>`;
+        // Mouse events
+        div.onmousedown = this.handleMouseDown;
+        div.onmouseup = this.handleMouseUp;
+        div.onmousemove = this.handleMouseMove;
+        div.oncontextmenu = (e) => { e.preventDefault(); this.handleRightClick(e); };
+
+        this.appendChild(div);
       }
+
+      mouseDown = false;
+      mouseStart = { x: 0, y: 0 };
+      mouseLast = { x: 0, y: 0 };
+      handleMouseDown = (event) => {
+        event.preventDefault();
+        this.mouseDown = true;
+        this.mouseStart.x = event.offsetX;
+        this.mouseStart.y = event.offsetY;
+        this.mouseLast = { x: event.offsetX, y: event.offsetY };
+      };
+      handleMouseUp = (event) => {
+        event.preventDefault();
+        if (!this.mouseDown) return;
+        this.mouseDown = false;
+        // Left click
+        this.leftClickCallBack({ x: event.offsetX, y: event.offsetY });
+      };
+      handleMouseMove = (event) => {
+        if (!this.mouseDown) return;
+        event.preventDefault();
+        const delta = {
+          x: event.offsetX - this.mouseLast.x,
+          y: event.offsetY - this.mouseLast.y
+        };
+        if (Math.abs(delta.x) > 1 || Math.abs(delta.y) > 1) {
+          this.deltaCallBack(delta);
+        }
+        this.mouseLast = { x: event.offsetX, y: event.offsetY };
+      };
+      handleRightClick = (event) => {
+        event.preventDefault();
+        this.rightClickCallBack({ x: event.offsetX, y: event.offsetY });
+      };
       start = {
         x: 0,
         y: 0,
