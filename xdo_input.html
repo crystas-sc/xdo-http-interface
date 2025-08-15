@@ -34,6 +34,7 @@
   --card-bg: #23272f;
   --border-radius: 0.75rem;
   --shadow: 0 2px 8px rgba(44,62,80,0.18);
+  --trackpad-bg: #7a6a2f;
     }
     body {
   background: var(--bg-main);
@@ -540,13 +541,14 @@
 
       render() {
         const div = document.createElement("div");
-        div.style.width = "100%";
-        div.style.height = "500px";
-        div.style.backgroundColor = "beige";
-        div.ontouchmove = this.handleTouchMove;
-        div.ontouchstart = this.handleTouchStart;
-        div.ontouchend = this.handleTouchEnd;
-        this.appendChild(div);
+  div.style.width = "100%";
+  div.style.height = "500px";
+  // Use CSS variable for trackpad background
+  div.style.backgroundColor = getComputedStyle(document.body).getPropertyValue('--trackpad-bg') || "beige";
+  div.ontouchmove = this.handleTouchMove;
+  div.ontouchstart = this.handleTouchStart;
+  div.ontouchend = this.handleTouchEnd;
+  this.appendChild(div);
 
         //this.innerHTML = `<h1>Hello, World!</h1>`;
       }
