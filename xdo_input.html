@@ -133,15 +133,16 @@
   </div>
   <form id="form" method="get" onsubmit="return populateTimestamp()">
     <p class="form-label inline-block mb-2 text-gray-700 text-xl">Last command: <span id="last-command">%(cmd)s %(key)s</span></p>
-    <div class="card w-full max-w-xl mb-4 text-center" id="favourite-section">
+    <div class="card w-full mb-4 text-center flex flex-col" id="favourite-section">
       <h2 class="text-2xl font-bold mb-2">Favourite Commands</h2>
-      <button type="button" class="btn px-4 py-2" onclick="addFavouriteCommand()">
-        <i class="fa fa-star mr-2"></i>Add Last Command to Favourites
+      <button type="button" class="btn px-4 py-2 w-full" onclick="addFavouriteCommand()">
+      <i class="fa fa-star mr-2"></i>Add Last Command to Favourites
       </button>
-      <div id="favourite-buttons" class="flex flex-wrap justify-center gap-2 mb-2"></div>      
+      <div id="favourite-buttons" class="flex flex-row flex-wrap justify-end items-end gap-2 mb-2 w-full text-right"></div>
     </div>
-    <div class="top-items p-2">
-      <input type="text" name="cmd" value="%(cmd)s" class="form-control
+    <div class="top-items p-2 " style="gap:1rem">
+      <div>  
+         <input type="text" name="cmd" value="%(cmd)s" class="form-control
       block
       w-full
       px-4
@@ -185,15 +186,17 @@
             onclick="sendClipboardData()">Send clipboard data</button>
 
         </div>
-
-        <div class="flex items-center self-center">
-          <label class="inline-block">Key relay</label>
-          <input class="form-control border border-solid border-gray-300 text-xl" type="text"
-            onkeyup="keyPressRelay(event)" placeholder="keys will be silently sent" autocapitalize="off" />
         </div>
-
-
       </div>
+
+
+        <div class="flex flex-col flex-1  items-center self-center">
+          <label class="inline-block">Key relay</label>
+            <input class="form-control w-full border border-solid border-gray-300 text-xl" type="text" style="height:4em;"
+            onkeyup="keyPressRelay(event)" placeholder="keys will be silently sent" autocapitalize="off" />
+          </div>
+
+
     </div>
 
 
@@ -362,8 +365,19 @@
       favourites.forEach((cmd, idx) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'flex items-center gap-2 mb-2';
-  const btn = document.createElement('button');
-  btn.className = 'btn py-6 px-8 text-2xl flex items-center gap-4';
+        const delBtn = document.createElement('button');
+        delBtn.className = 'rounded-full px-4 py-6 bg-red-600 hover:bg-red-800 text-white shadow-md flex items-center justify-center';
+        delBtn.title = 'Delete Favourite';
+        delBtn.innerHTML = `<i class='fa fa-trash'></i>`;
+        delBtn.style.height = '100%';
+        delBtn.onclick = function(e) {
+          e.stopPropagation();
+          favourites.splice(idx, 1);
+          localStorage.setItem('favouriteCommands', JSON.stringify(favourites));
+          renderFavouriteButtons();
+        };
+        const btn = document.createElement('button');
+        btn.className = 'btn py-6 px-8 text-2xl flex items-center gap-4  justify-start';
         btn.innerHTML = `<i class='fa fa-bolt'></i> ${cmd}`;
         btn.onclick = function() {
           const parts = cmd.split(' ');
@@ -378,18 +392,8 @@
             form.submit();
           }
         };
-        const delBtn = document.createElement('button');
-  delBtn.className = 'rounded-full px-3 py-2 bg-red-600 hover:bg-red-800 text-white shadow-md flex items-center justify-center';
-        delBtn.title = 'Delete Favourite';
-        delBtn.innerHTML = `<i class='fa fa-trash'></i>`;
-        delBtn.onclick = function(e) {
-          e.stopPropagation();
-          favourites.splice(idx, 1);
-          localStorage.setItem('favouriteCommands', JSON.stringify(favourites));
-          renderFavouriteButtons();
-        };
-        wrapper.appendChild(btn);
         wrapper.appendChild(delBtn);
+        wrapper.appendChild(btn);
         container.appendChild(wrapper);
       });
     }
